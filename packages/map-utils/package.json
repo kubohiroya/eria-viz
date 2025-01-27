@@ -1,0 +1,23 @@
+{
+  "name": "@eria-viz/map-utils",
+  "version": "0.0.0",
+  "file": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/packages/map-utils/src/index.d.ts",
+      "import": "./dist/index.es.js"
+    }
+  },
+  "main": "dist/index.es.js",
+  "types": "./dist/packages/map-utils/src/index.d.ts",
+  "scripts": {
+    "build": "pnpm install && vite build && tsc --emitDeclarationOnly"
+  },
+  "devDependencies": {
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
+}

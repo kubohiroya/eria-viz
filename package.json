@@ -1,0 +1,47 @@
+{
+  "name": "eria-viz",
+  "version": "1.0.0",
+  "description": "Indexed GeoJSON MapViewer",
+  "private": true,
+  "type": "commonjs",
+  "license": "ISC",
+  "author": {
+    "name": "Hiroya Kubo",
+    "email": "hiroya@cuc.ac.jp"
+  },
+  "keywords": [
+    "IndexedDB",
+    "GADM"
+  ],
+  "workspaces": [
+    "packages/*"
+  ],
+  "packageManager": "pnpm@9.15.3",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=9.15.3",
+    "npm": "use pnpm",
+    "yarn": "use pnpm"
+  },
+  "scripts": {
+    "preinstall": "npx -y only-allow pnpm",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "check-types": "turbo run bcheck-types",
+    "preview": "vite preview",
+    "predeploy": "pnpm run build",
+    "deploy": "gh-pages -d dist/indexed-geojson-map -r git@github.com:kubohiroya/indexed-geojson-map.git",
+    "gadm-select": "pnpm -F \"gadm-select\"",
+    "gadm-download": "pnpm -F \"gadm-download\"",
+    "gadm-indexeddb": "pnpm -F \"gadm-indexeddb\"",
+    "indexed-geojson": "pnpm -F \"indexed-geojson\"",
+    "react-indexed-geojson": "pnpm -F \"react-indexed-geojson\""
+  },
+  "devDependencies": {
+    "@swc/core": "^1.10.7",
+    "@types/node": "^22.10.5",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "include": [],
+  "references": [
+    {
+      "path": "packages/gadm-download"
+    },
+    {
+      "path": "packages/indexed-geojson"
+    },
+    {
+      "path": "packages/map-utils"
+    },
+    {
+      "path": "packages/react-gadm-select"
+    },
+    {
+      "path": "packages/react-indexed-geojson"
+    },
+    {
+      "path": "packages/react-indexed-geojson-viewer"
+    },
+    {
+      "path": "packages/react-indexed-geojson-app"
+    }
+    ]
+}
