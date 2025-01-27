@@ -13,7 +13,6 @@ import {
   IconButton,
   Alert,
 } from "@mui/material";
-import { BrowserRouter, Link } from "react-router";
 import { Close } from "@mui/icons-material";
 import { GADMStoragePanel } from "./GADMStoragePanel";
 import { GADMSourcePanel } from "./GADMSourcePanel";
@@ -174,7 +173,7 @@ export const GADMSelectDialogCore = ({
       (await databaseCatalogRoot.current?.get(databaseName)) ||
       (await databaseCatalogRoot.current?.create(databaseName, "", {}));
     gadmService.current = await GADMService.createInstance(
-      databaseCatalog.current.getIndexedDBName(),
+      databaseCatalog.current.name
     );
     setDatabaseName(databaseName);
     if (!databaseNames.includes(databaseName)) {
@@ -248,7 +247,6 @@ export const GADMSelectDialogCore = ({
       if (!gadmService.current) {
         return;
       }
-
       const downloadCountryMetadataArray = countryMetadataArray.filter(
         (_: CountryMetadata, rowIndex: number) => {
           return selectCheckboxMatrix[rowIndex].some(
@@ -257,6 +255,7 @@ export const GADMSelectDialogCore = ({
         },
       );
       setDownloadCountryMetadataArray(downloadCountryMetadataArray);
+      console.log('initializeDownloadPanel', countryMetadataArray, selectCheckboxMatrix, downloadCountryMetadataArray);
 
       const downloadStatusMatrix = selectCheckboxMatrix
         .map((row: Array<boolean | undefined>, rowIndex: number) => {
@@ -318,13 +317,13 @@ export const GADMSelectDialogCore = ({
       },
       contents: (
         <GADMSelectPanel
-          maxAdminLevel={maxAdminLevel}
-          checkboxMatrix={selectCheckboxMatrix}
-          handleCheckedCountChange={handleSelectedCountChange}
-          handleCheckboxMatrixChange={handleSelectCheckboxMatrixChange}
           countryIndexPageUrl={countryIndexPageUrl}
           handleCountryIndexPageUrlChange={handleCountryIndexPageUrlUpdate}
+          maxAdminLevel={maxAdminLevel}
+          checkboxMatrix={selectCheckboxMatrix}
           countryMetadataArray={countryMetadataArray}
+          handleCheckedCountChange={handleSelectedCountChange}
+          handleCheckboxMatrixChange={handleSelectCheckboxMatrixChange}
         />
       ),
       isNextButtonEnabled: () => selectedCount > 0,
@@ -332,12 +331,12 @@ export const GADMSelectDialogCore = ({
     {
       label: "Download",
       title: "Download selected hape files",
-      onEnter: () => {
+      onEnter: useCallback(() => {
         initializeDownloadPanel(countryMetadataArray, selectCheckboxMatrix);
 
         // Comlinkでダウンロードを開始
         // 修了したらAlartを表示
-      },
+      }, [countryMetadataArray, selectCheckboxMatrix]),
       contents: (
         <GADMDownloadPanel
           databaseName={databaseName}

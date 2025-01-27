@@ -8,7 +8,7 @@ import {
 import React, { memo } from "react";
 import { CountryMetadata } from "../types/CountryMetadata";
 import { createNumberArray } from "../utils/arrayUtils";
-import { createGADMCountryUrl, createGADMRegionUrl } from "../utils/GADMUtils";
+import { GADMService } from "../services/GADMService";
 
 const GADMSelectBodyPanelCore = ({
   maxAdminLevel,
@@ -58,7 +58,7 @@ const GADMSelectBodyPanelCore = ({
           name={dataIndex.toString()}
         />
         <a
-          href={createGADMCountryUrl(item.countryCode)}
+          href={GADMService.createGADMCountryUrl(item.countryCode)}
           target="_blank"
           rel="noreferrer"
         >
@@ -76,7 +76,7 @@ const GADMSelectBodyPanelCore = ({
               />
               {level === 0 && (
                 <a
-                  href={createGADMCountryUrl(item.countryCode)}
+                  href={GADMService.createGADMCountryUrl(item.countryCode)}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -85,7 +85,10 @@ const GADMSelectBodyPanelCore = ({
               )}
               {level === 1 && (
                 <a
-                  href={createGADMRegionUrl(item.countryCode, level)}
+                  href={GADMService.createGADMRegionUrl(
+                    item.countryCode,
+                    level,
+                  )}
                   target="_blank"
                   rel="noreferrer"
                 >

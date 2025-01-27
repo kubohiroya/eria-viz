@@ -7,9 +7,9 @@ import {
 import React, { memo } from "react";
 import { CountryMetadata } from "../types/CountryMetadata";
 import { createNumberArray } from "../utils/arrayUtils";
-import { createGADMCountryUrl } from "../utils/GADMUtils";
 import { DownloadDone } from "@mui/icons-material";
 import { DownloadStatus } from "../types/DownloadStatus";
+import { GADMService } from "../services/GADMService";
 
 const DownloadingIcon = ({
   state,
@@ -47,7 +47,7 @@ const GADMDownloadBodyPanelCore = ({
       <TableRow key={dataIndex}>
         <TableCell component="th" scope="row">
           <a
-            href={createGADMCountryUrl(item.countryCode)}
+            href={GADMService.createGADMCountryUrl(item.countryCode)}
             target="_blank"
             rel="noreferrer"
           >

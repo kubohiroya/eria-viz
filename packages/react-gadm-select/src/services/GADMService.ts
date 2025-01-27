@@ -1,10 +1,8 @@
-import {GeoJSONDB, getGeoJSONDB } from "@eria-viz/indexed-geojson";
-import { DatabaseCatalog } from "@eria-viz/indexeddb-catalog";
-import { groupBy } from "../utils/arrayUtils";
-import { GeoJSONMetadata } from "@eria-viz/indexed-geojson";
-import { CountryMetadata } from "../types/CountryMetadata";
-import { createGADMCountryUrl, createGADMRegionUrl } from "../utils/GADMUtils";
-import { DownloadStatus } from "../types/DownloadStatus";
+import {GeoJSONDB, GeoJSONMetadata, getGeoJSONDB} from "@eria-viz/indexed-geojson";
+import {DatabaseCatalog} from "@eria-viz/indexeddb-catalog";
+import {groupBy} from "../utils/arrayUtils";
+import {CountryMetadata} from "../types/CountryMetadata";
+import {DownloadStatus} from "../types/DownloadStatus";
 
 export enum CheckboxState {
     Unchecked,
@@ -29,6 +27,14 @@ export class GADMService{
     countryMetadataArray: CountryMetadata[];
     maxAdminLevel: number;
 
+    static createGADMCountryUrl(countryCode: string) {
+        return `https://gadm.org/maps/${countryCode}.html`;
+    }
+
+    static createGADMRegionUrl(countryCode: string, level: number) {
+        return `https://gadm.org/maps/${countryCode}_${level}.html`;
+    }
+
     static async getCatalogRoot(): Promise<DatabaseCatalog>{
         if(GADMService.catalogRoot == null){
             GADMService.catalogRoot = await DatabaseCatalog.initialize("GADMDatabaseCatalog", "", false);
@@ -37,7 +43,7 @@ export class GADMService{
     }
 
     static async listDatabaseNames():Promise<string[]> {
-        return (await GADMService.getCatalogRoot()).listNames();
+        return (await (await GADMService.getCatalogRoot()).listNames()).sort();
     }
 
     static async getDefaultDatabaseName():Promise<string> {
@@ -188,9 +194,9 @@ export class GADMService{
             Promise.all(new Array<boolean>(countryMetadata.maxAdminLevel + 1).map(async(_: boolean, adminLevel: number) => {
                 if(selectCheckboxMatrix[countryIndex][adminLevel]) {
                     if (adminLevel === 0) {
-                        return createGADMCountryUrl(countryMetadata.countryCode);
+                        return GADMService.createGADMCountryUrl(countryMetadata.countryCode);
                     } else {
-                        return createGADMRegionUrl(countryMetadata.countryCode, adminLevel);
+                        return GADMService.createGADMRegionUrl(countryMetadata.countryCode, adminLevel);
                     }
                 }else{
                     return null;
@@ -244,3 +250,4 @@ export class GADMService{
 })();
 */
 }
+
