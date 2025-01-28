@@ -1,0 +1,23 @@
+{
+  "name": "@eria-viz/indexeddb-geojson-store",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "type": "module",
+  "types": "./dist/packages/indexeddb-geojson-store/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/packages/indexeddb-geojson-store/src/index.d.ts",
+      "import": "./dist/index.es.js"
+    }
+  },
+  "scripts": {
+    "build": "pnpm install && vite build && tsc --emitDeclarationOnly"
+  },
+  "dependencies": {
+    "@eria-viz/indexeddb-geojson": "workspace:*",
+    "@eria-viz/map-utils": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^6.0.7"
+  }
+}
