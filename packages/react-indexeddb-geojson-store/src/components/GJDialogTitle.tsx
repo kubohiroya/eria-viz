@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { memo } from "react";
 
-const GADMDialogTitleCore = ({
+const GJDialogTitleCore = ({
   title,
   currentStepIndex,
   completedStepIndex,
@@ -35,4 +35,4 @@ const GADMDialogTitleCore = ({
     </DialogTitle>
   );
 };
-export const GADMDialogTitle = memo(GADMDialogTitleCore);
+export const GJDialogTitle = memo(GJDialogTitleCore);

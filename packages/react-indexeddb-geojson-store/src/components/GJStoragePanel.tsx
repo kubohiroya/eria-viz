@@ -10,7 +10,7 @@ import {
 import { FiberNew } from "@mui/icons-material";
 import { GADMStoragePanelProps } from "./GADMStoragePanelProps";
 
-const GADMStoragePanelCore = ({
+const GJStoragePanelCore = ({
   children,
   databaseNames,
   databaseName,
@@ -61,4 +61,4 @@ const GADMStoragePanelCore = ({
     </>
   );
 };
-export const GADMStoragePanel = memo(GADMStoragePanelCore);
+export const GJStoragePanel = memo(GJStoragePanelCore);

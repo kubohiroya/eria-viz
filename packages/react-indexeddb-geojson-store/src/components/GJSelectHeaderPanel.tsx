@@ -1,9 +1,9 @@
 import { Checkbox, TableCell, Typography } from "@mui/material";
 import React, { memo } from "react";
 import { createNumberArray } from "../utils/arrayUtils";
-import { GADMIcon } from "./GADMIcon";
+import { GJIcon } from "./GJIcon";
 
-const GADMSelectHeaderPanelCore = ({
+const GJSelectHeaderPanelCore = ({
   maxAdminLevel,
   northWestHeaderChecked,
   northWestHeaderIndetermined,
@@ -39,10 +39,10 @@ const GADMSelectHeaderPanelCore = ({
             onChange={handleColumnHeaderCheckboxChange(level)}
             name={`${level}`}
           />
-          <GADMIcon level={level} />
+          <GJIcon level={level} />
         </TableCell>
       ))}
     </>
   );
 };
-export const GADMSelectHeaderPanel = memo(GADMSelectHeaderPanelCore);
+export const GJSelectHeaderPanel = memo(GJSelectHeaderPanelCore);

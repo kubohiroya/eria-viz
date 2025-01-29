@@ -1,6 +1,6 @@
 import React from 'react';
 import {useState} from "react";
-import { GADMDialog } from './components/GADMDialog';
+import { GJDialog } from './components/GJDialog';
 import {BrowserRouter, Router } from 'react-router';
 import { Button } from '@mui/material';
 
@@ -11,7 +11,7 @@ export const Index = ()=> {
         <>
             <BrowserRouter>
                 <Button variant="contained" onClick={() => setShowDialog(true)} disabled={showDialog}>Open Dialog</Button>
-                {showDialog && <GADMDialog setShowDialog={setShowDialog} initialize/>}
+                {showDialog && <GJDialog setShowDialog={setShowDialog} initialize/>}
             </BrowserRouter>
         </>
     );

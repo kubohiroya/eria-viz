@@ -10,8 +10,8 @@ import {
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import { CountryMetadata } from "../types/CountryMetadata";
 import { produce } from "immer";
-import { GADMSelectHeaderPanel } from "./GADMSelectHeaderPanel";
-import { GADMSelectBodyPanel } from "./GADMSelectBodyPanel";
+import { GJSelectHeaderPanel } from "./GJSelectHeaderPanel";
+import { GJSelectBodyPanel } from "./GJSelectBodyPanel";
 import { CheckboxState, GADMService } from "../services/GADMService";
 
 const SelectorTable = styled(Table)`
@@ -20,7 +20,7 @@ const SelectorTable = styled(Table)`
   }
 `;
 
-interface GADMResourceSelectorPanelProps {
+interface GJResourceSelectorPanelProps {
   downloadedMatrix: boolean[][];
   checkboxMatrix: boolean[][];
   countryIndexPageUrl: string;
@@ -31,7 +31,7 @@ interface GADMResourceSelectorPanelProps {
   handleCountryIndexPageUrlChange: (url: string) => void;
 }
 
-const GADMSelectPanelCore = ({
+const GJSelectPanelCore = ({
   downloadedMatrix,
   checkboxMatrix,
   countryIndexPageUrl,
@@ -40,7 +40,7 @@ const GADMSelectPanelCore = ({
   handleCheckedCountChange,
   handleCheckboxMatrixChange,
   handleCountryIndexPageUrlChange,
-}: GADMResourceSelectorPanelProps) => {
+}: GJResourceSelectorPanelProps) => {
   const handleContryIndexPageUrlChanged = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -152,7 +152,7 @@ const GADMSelectPanelCore = ({
         <SelectorTable stickyHeader size="small">
           <TableHead>
             <TableRow>
-              <GADMSelectHeaderPanel
+              <GJSelectHeaderPanel
                 maxAdminLevel={maxAdminLevel}
                 northWestHeaderChecked={
                   headerCheckboxState.northWestHeader === CheckboxState.Checked
@@ -175,7 +175,7 @@ const GADMSelectPanelCore = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            <GADMSelectBodyPanel
+            <GJSelectBodyPanel
               maxAdminLevel={maxAdminLevel}
               rowHeaderChecked={headerCheckboxState.rowHeader.map(
                 (state) => state === CheckboxState.Checked,
@@ -199,4 +199,4 @@ const GADMSelectPanelCore = ({
     </>
   );
 };
-export const GADMSelectPanel = memo(GADMSelectPanelCore);
+export const GJSelectPanel = memo(GJSelectPanelCore);

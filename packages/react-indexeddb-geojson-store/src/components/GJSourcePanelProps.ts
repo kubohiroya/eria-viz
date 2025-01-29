@@ -5,11 +5,11 @@ export type SourceMetadata = {
   licensePageUrl: string;
 };
 
-export type GADMSourcePanelProps = {
+export type GJSourcePanelProps = {
   selectedSourceName: string | undefined;
   setSelectedSourceName: (sourceName: string) => void;
   sourceNameArray: string[];
   sources: Map<string, SourceMetadata>;
-  licenseAgreement: Map<string, boolean>;
+  licenseAgreement: {[key:string]: boolean};
   agreeLicense: (sourceName: string) => void;
 };

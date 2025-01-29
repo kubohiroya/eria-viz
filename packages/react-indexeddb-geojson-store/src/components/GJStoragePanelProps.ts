@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-export type GADMStoragePanelProps = {
+export type GJStoragePanelProps = {
   children: ReactNode;
   databaseName: string;
   databaseNames: string[];

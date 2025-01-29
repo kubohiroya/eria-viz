@@ -15,7 +15,7 @@ import { Launch } from "@mui/icons-material";
 import { GADMSourcePanelProps, SourceMetadata } from "./GADMSourcePanelProps";
 import { Link } from "react-router";
 
-export const GADMSourcePanelCore = ({
+export const GJSourcePanelCore = ({
   selectedSourceName,
   setSelectedSourceName,
   sourceNameArray,
@@ -94,4 +94,4 @@ export const GADMSourcePanelCore = ({
     </>
   );
 };
-export const GADMSourcePanel = memo(GADMSourcePanelCore);
+export const GJSourcePanel = memo(GJSourcePanelCore);

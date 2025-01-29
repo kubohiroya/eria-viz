@@ -1,65 +1,24 @@
-import React, {ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { memo } from "react";
-import {
-  Dialog,
-  Typography,
-  DialogContent,
-  Box,
-  Card,
-  CardContent,
-  CardActionArea,
-  DialogActions,
-  Button,
-  IconButton,
-  Alert,
-} from "@mui/material";
-import { Close } from "@mui/icons-material";
-import { GADMStoragePanel } from "./GADMStoragePanel";
-import { GADMSourcePanel } from "./GADMSourcePanel";
-import { CountryMetadata } from "../types/CountryMetadata";
-import { GADMSelectPanel } from "./GADMSelectPanel";
-import { GADMDownloadPanel } from "./GADMDownloadPanel";
-import { GADMService } from "../services/GADMService";
-import { DatabaseCatalog } from "@eria-viz/indexeddb-catalog";
-import { DownloadStatus } from "../types/DownloadStatus";
-import { GADMDialogTitle } from "./GADMDialogTitle";
-import { download } from "@eria-viz/download";
+import React, {memo, ReactNode, useCallback, useEffect, useRef, useState} from "react";
+import {Alert, Box, Card, CardActionArea, CardContent, Dialog, DialogContent, Typography,} from "@mui/material";
+import {GJStoragePanel} from "./GJStoragePanel";
+import {GJSourcePanel} from "./GJSourcePanel";
+import {CountryMetadata} from "../types/CountryMetadata";
+import {GJSelectPanel} from "./GJSelectPanel";
+import {GJDownloadPanel} from "./GJDownloadPanel";
+import {GADMService} from "../services/GADMService";
+import {DatabaseCatalog} from "@eria-viz/indexeddb-catalog";
+import {DownloadStatus} from "../types/DownloadStatus";
+import {GJDialogTitle} from "./GJDialogTitle";
+import {download} from "@eria-viz/download";
+import {GJDialogActions} from "./GJDialogActions";
+import {GJDialogStepTitle} from "./GJDialogStepTitle";
+import { GJDialogProps } from "./GJDialogProps";
+import { ShapeFileSourceNames, ShapeFileSources, ShapreFileSourceNameArray } from "./ShapeFileSources";
 
-export type GADMSelectDialogProps = {
-  setShowDialog: (show: boolean) => void;
-  initialize: true;
-};
 
-enum SourceNames {
-  GADM = "GADM",
-}
-const sourceNameArray = [SourceNames.GADM];
-
-const sources = new Map<
-  string,
-  {
-    sourceName: string;
-    sourcePageUrl: string;
-    sourceDescription: string;
-    licensePageUrl: string;
-    countryIndexPageUrl: string;
-  }
->([
-  [
-    "GADM",
-    {
-      sourceName: SourceNames.GADM,
-      sourcePageUrl: "https://gadm.org",
-      sourceDescription: `GADM is a spatial database of the location of the world's administrative areas (or adminstrative boundaries) for use in GIS and similar software. Administrative areas in this database are countries and lower level subdivisions such as provinces, departments, bibhag, bundeslander, daerah istimewa, fivondronana, krong, landsvæðun, opština, sous-préfectures, counties, and thana. GADM describes where these administrative areas are (the "spatial features"), and for each area it provides some attributes, such as the name and variant names.`,
-      licensePageUrl: "https://gadm.org/license.html",
-      countryIndexPageUrl: "https://gadm.org/download_country.html",
-    },
-  ],
-]);
-
-export const GADMSelectDialogCore = ({
+export const GJDialogCore = ({
   setShowDialog,
-}: GADMSelectDialogProps) => {
+}: GJDialogProps) => {
   const nextButtonRef = useRef<HTMLButtonElement>(null);
 
   const hideDialog = useCallback(() => setShowDialog(false), [setShowDialog]);
@@ -111,9 +70,7 @@ export const GADMSelectDialogCore = ({
 
   const [databaseNames, setDatabaseNames] = useState<Array<string>>([]);
   const [databaseName, setDatabaseName] = useState<string>("");
-  const [downloadedMatrix, setDownloadedMatrix] = useState<boolean[][]>(
-      [],
-  );
+  const [downloadedMatrix, setDownloadedMatrix] = useState<boolean[][]>([]);
 
   const focusNextButton = useCallback(() => {
     setTimeout(() => {
@@ -147,8 +104,9 @@ export const GADMSelectDialogCore = ({
   }, []);
 
   const handleAgreeLicense = useCallback((sourceName: string) => {
-    licenseAgreement.set(sourceName, true);
-    setLicenseAgreement(licenseAgreement);
+    const newLicenseAgreement = {...licenseAgreement};
+    newLicenseAgreement[sourceName] = true;
+    setLicenseAgreement(newLicenseAgreement);
     focusNextButton();
   }, []);
 
@@ -192,14 +150,12 @@ export const GADMSelectDialogCore = ({
   }, []);
 
   const [selectedSourceName, setSelectedSourceName] = useState<string>(
-    SourceNames.GADM,
+      ShapeFileSourceNames.GADM,
   );
-  const [licenseAgreement, setLicenseAgreement] = useState<
-    Map<string, boolean>
-  >(new Map<string, boolean>());
+  const [licenseAgreement, setLicenseAgreement] = useState<{[key:string]: boolean}>({});
   const [maxAdminLevel, setMaxAdminLevel] = useState<number>(3);
   const [countryIndexPageUrl, setCountryIndexPageUrl] = useState<string>(
-    sources.get(SourceNames.GADM)!.countryIndexPageUrl,
+    ShapeFileSources.get(ShapeFileSourceNames.GADM)!.countryIndexPageUrl,
   );
   const [countryMetadataArray, setCountryMetadataArray] = useState<
     Array<CountryMetadata>
@@ -219,13 +175,14 @@ export const GADMSelectDialogCore = ({
 
   const handleCountryIndexPageUrlUpdate = useCallback(
     (indexPageUrl: string) => {
+      setCountryIndexPageUrl(indexPageUrl);
       download(
         indexPageUrl,
           {
-            onFailed: (message) => {
+            onFailed: (message: string) => {
               console.error(indexPageUrl, message);
             },
-            text: (content) => {
+            text: (content: string) => {
               initializeSelectPanel(content);
             }
           }
@@ -249,7 +206,7 @@ export const GADMSelectDialogCore = ({
     if(count == 0) {
       hideFooter();
     }else{
-      setFooter(`Selected shape count: ${count}`);
+      setFooter(`Selected shape files: ${count}`);
     }
   }, []);
 
@@ -300,7 +257,7 @@ export const GADMSelectDialogCore = ({
         hideFooter();
       },
       contents: (
-        <GADMStoragePanel
+        <GJStoragePanel
           databaseNames={databaseNames}
           databaseName={databaseName}
           handleDatabaseNameChange={handleDatabaseNameChange}
@@ -309,7 +266,7 @@ export const GADMSelectDialogCore = ({
             Please enter new storage name or select one of the preexisting
             storages to store shape files:
           </Alert>
-        </GADMStoragePanel>
+        </GJStoragePanel>
       ),
       isNextButtonEnabled: () => databaseName !== "",
     },
@@ -321,26 +278,26 @@ export const GADMSelectDialogCore = ({
         hideFooter();
       },
       contents: (
-        <GADMSourcePanel
+        <GJSourcePanel
           selectedSourceName={selectedSourceName}
           setSelectedSourceName={setSelectedSourceName}
-          sources={sources}
-          sourceNameArray={sourceNameArray}
+          sources={ShapeFileSources}
+          sourceNameArray={ShapreFileSourceNameArray}
           licenseAgreement={licenseAgreement}
           agreeLicense={handleAgreeLicense}
         />
       ),
-      isNextButtonEnabled: () => licenseAgreement,
+      isNextButtonEnabled: () => licenseAgreement[selectedSourceName] ?? false,
     },
     {
-      label: "Shape Files",
-      title: "Select Countries and Admin Levels to download its shape files",
+      label: "Countries/Admin Levels",
+      title: "Select countries and admin levels to download its shape files",
       onEnter: () => {
         handleCountryIndexPageUrlUpdate(countryIndexPageUrl);
         showSelectedCount(selectedCount);
       },
       contents: (
-        <GADMSelectPanel
+        <GJSelectPanel
           countryIndexPageUrl={countryIndexPageUrl}
           handleCountryIndexPageUrlChange={handleCountryIndexPageUrlUpdate}
           maxAdminLevel={maxAdminLevel}
@@ -363,7 +320,7 @@ export const GADMSelectDialogCore = ({
         // 修了したらAlartを表示
       }, [countryMetadataArray, selectCheckboxMatrix]),
       contents: (
-        <GADMDownloadPanel
+        <GJDownloadPanel
           databaseName={databaseName}
           maxAdminLevel={maxAdminLevel}
           downloadCountryMetadataArray={downloadCountryMetadataArray}
@@ -376,7 +333,7 @@ export const GADMSelectDialogCore = ({
 
   return (
     <Dialog open={true} maxWidth="xl" fullWidth>
-      <GADMDialogTitle
+      <GJDialogTitle
         title="Shape File Downloader"
         currentStepIndex={currentStepIndex}
         completedStepIndex={completedStepIndex}
@@ -391,18 +348,10 @@ export const GADMSelectDialogCore = ({
           ) : (
             <Card>
               <CardContent>
-                <Typography
-                  sx={{
-                    fontSize: "14px",
-                    fontStyle: "bold",
-                    marginBottom: "16px",
-                  }}
-                >
-                  {steps[currentStepIndex]?.label +
-                    " : " +
-                    steps[currentStepIndex]?.title}
-                </Typography>
-
+                <GJDialogStepTitle
+                    label={steps[currentStepIndex]?.label}
+                    title={steps[currentStepIndex]?.title}
+                />
                 {steps[currentStepIndex]?.contents}
               </CardContent>
               <CardActionArea></CardActionArea>
@@ -410,48 +359,18 @@ export const GADMSelectDialogCore = ({
           )}
         </Box>
       </DialogContent>
-      <DialogActions sx={{ margin: "10px" }}>
-        <IconButton
-          size="large"
-          sx={{
-            position: "absolute",
-            top: "-4px",
-            right: "-4px",
-          }}
-          onClick={hideDialog}
-        >
-          <Close style={{ width: "40px", height: "40px" }} />
-        </IconButton>
-        <Button
-          size="large"
-          style={{ padding: "16px 48px 16px 48px" }}
-          variant={"contained"}
-          color="inherit"
-          onClick={handleBack}
-        >
-          {currentStepIndex === 0 ? "Cancel" : "Back"}
-        </Button>
-        <Box sx={{ flex: "1 1 auto"}}>
-          <Typography textAlign={"right"}>{footer}</Typography>
-        </Box>
-        <Button
-          size="large"
-          style={{ padding: "16px 48px 16px 48px" }}
-          variant={"contained"}
-          disabled={!steps[currentStepIndex].isNextButtonEnabled()}
-          title={
-            currentStepIndex < steps.length - 1
-              ? `Step ${currentStepIndex + 1}`
-              : "Finish"
-          }
-          onClick={handleNext}
-          ref={nextButtonRef}
-        >
-          {currentStepIndex < steps.length - 1 ? "Next" : "Finish"}
-        </Button>
-      </DialogActions>
+      <GJDialogActions
+        hideDialog={hideDialog}
+        handleBack={handleBack}
+        handleNext={handleNext}
+        currentStepIndex={currentStepIndex}
+        numSteps={steps.length}
+        isNextButtonEnabled={steps[currentStepIndex]?.isNextButtonEnabled()}
+        footer={footer}
+        nextButtonRef={nextButtonRef}
+      />
     </Dialog>
   );
 };
 
-export const GADMDialog = memo(GADMSelectDialogCore);
+export const GJDialog = memo(GJDialogCore);

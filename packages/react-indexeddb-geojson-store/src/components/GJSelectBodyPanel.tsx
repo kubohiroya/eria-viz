@@ -56,7 +56,7 @@ const FileAlreadyDownloadedIcon = () => {
   );
 };
 
-const GADMSelectBodyPanelCore = ({
+const GJSelectBodyPanelCore = ({
   maxAdminLevel,
   rowHeaderChecked,
   rowHeaderIndetermined,
@@ -159,4 +159,4 @@ const GADMSelectBodyPanelCore = ({
   ));
 };
 
-export const GADMSelectBodyPanel = memo(GADMSelectBodyPanelCore);
+export const GJSelectBodyPanel = memo(GJSelectBodyPanelCore);
