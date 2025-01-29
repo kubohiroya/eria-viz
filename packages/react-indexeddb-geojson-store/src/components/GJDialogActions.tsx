@@ -3,7 +3,7 @@ import {Box, Button, DialogActions, IconButton, Typography } from "@mui/material
 import React, { ReactNode } from "react"
 import { memo } from "react"
 
-type GJDialogActionsProps = {
+type GJActionsProps = {
     hideDialog: ()=>void
     handleBack: ()=>void
     handleNext: ()=>void
@@ -22,7 +22,7 @@ const GJDialogActionsCore = ({
                                    numSteps,
     footer,
     nextButtonRef
-                               }: GADMDialogActionsProps)=>{
+                               }: GJActionsProps)=>{
     return (
         <DialogActions sx={{ margin: "10px" }}>
             <IconButton

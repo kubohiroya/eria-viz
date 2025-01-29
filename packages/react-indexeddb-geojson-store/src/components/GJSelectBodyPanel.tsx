@@ -8,7 +8,7 @@ import {
 import React, { memo } from "react";
 import { CountryMetadata } from "../types/CountryMetadata";
 import { createNumberArray } from "../utils/arrayUtils";
-import { GADMService } from "../services/GADMService";
+import { GJService } from "../services/GJService";
 import { FileDownload, FileDownloadDone } from "@mui/icons-material";
 import { InlineIcon } from "./InlineIcon/InlineIcon";
 
@@ -106,7 +106,7 @@ const GJSelectBodyPanelCore = ({
           name={dataIndex.toString()}
         />
         <a
-          href={GADMService.createGADMCountryUrl(item.countryCode)}
+          href={GJService.createCountryUrl(item.countryCode)}
           target="_blank"
           rel="noreferrer"
         >
@@ -130,7 +130,7 @@ const GJSelectBodyPanelCore = ({
                 ) : (
                   level === 0 && (
                     <a
-                      href={GADMService.createGADMCountryUrl(item.countryCode)}
+                      href={GJService.createCountryUrl(item.countryCode)}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -140,7 +140,7 @@ const GJSelectBodyPanelCore = ({
                 )}
                 {level === 1 && (
                   <a
-                    href={GADMService.createGADMRegionUrl(
+                    href={GJService.createAdminUrl(
                       item.countryCode,
                       level,
                     )}

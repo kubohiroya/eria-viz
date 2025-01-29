@@ -8,11 +8,11 @@ import {
 import { Tooltip, Typography } from "@mui/material";
 import React, { memo } from "react";
 
-export type GADMIconProps = {
+export type GJIconProps = {
   level: number;
 };
 
-const GJIconCore = ({ level }: GADMIconProps) => {
+const GJIconCore = ({ level }: GJIconProps) => {
   return (
     <Tooltip
       title={`Level ${level}: ${level === 0 ? "Country" : level === 1 ? "Division" : level === 2 ? "Subdivision" : level === 3 ? "Subsubdivision" : ""}`}

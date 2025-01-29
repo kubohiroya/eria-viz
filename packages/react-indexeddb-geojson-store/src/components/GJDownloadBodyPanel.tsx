@@ -3,7 +3,8 @@ import React, {memo} from "react";
 import {CountryMetadata} from "../types/CountryMetadata";
 import {createNumberArray} from "../utils/arrayUtils";
 import {DownloadStatus} from "../types/DownloadStatus";
-import {GADMService} from "../services/GADMService";
+import {GJService} from "../services/GJService";
+import { DownloadingIcon } from "./DownloadingIcon";
 
 const GJDownloadBodyPanelCore = ({
   maxAdminLevel,
@@ -26,7 +27,7 @@ const GJDownloadBodyPanelCore = ({
         <TableRow key={dataIndex}>
         <TableCell component="th" scope="row" >
           <a
-            href={GADMService.createGADMCountryUrl(item.countryCode)}
+            href={GJService.createCountryUrl(item.countryCode)}
             target="_blank"
             rel="noreferrer"
           >

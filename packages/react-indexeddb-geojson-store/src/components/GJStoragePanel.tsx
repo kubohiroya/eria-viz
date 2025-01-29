@@ -8,14 +8,14 @@ import {
   TextField,
 } from "@mui/material";
 import { FiberNew } from "@mui/icons-material";
-import { GADMStoragePanelProps } from "./GADMStoragePanelProps";
+import { GJStoragePanelProps } from "./GJStoragePanelProps";
 
 const GJStoragePanelCore = ({
   children,
   databaseNames,
   databaseName,
   handleDatabaseNameChange,
-}: GADMStoragePanelProps) => {
+}: GJStoragePanelProps) => {
   const handleChange = useCallback(
     (
       event: SyntheticEvent<Element, Event>,

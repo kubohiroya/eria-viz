@@ -12,7 +12,7 @@ import { CountryMetadata } from "../types/CountryMetadata";
 import { produce } from "immer";
 import { GJSelectHeaderPanel } from "./GJSelectHeaderPanel";
 import { GJSelectBodyPanel } from "./GJSelectBodyPanel";
-import { CheckboxState, GADMService } from "../services/GADMService";
+import { CheckboxState, GJService } from "../services/GJService";
 
 const SelectorTable = styled(Table)`
   & > tbody > tr > td {
@@ -49,7 +49,7 @@ const GJSelectPanelCore = ({
 
   const headerCheckboxState = useMemo(
     () =>
-      GADMService.createHeaderCheckboxState(
+      GJService.createHeaderCheckboxState(
         checkboxMatrix,
         maxAdminLevel,
         countryMetadataArray,

@@ -17,7 +17,7 @@ export type HeaderCheckboxState = {
     checkedCount: number;
 };
 
-export class GADMService{
+export class GJService {
 
     static catalogRoot: DatabaseCatalog;
 
@@ -27,39 +27,39 @@ export class GADMService{
     countryMetadataArray: CountryMetadata[];
     maxAdminLevel: number;
 
-    static createGADMCountryUrl(countryCode: string) {
+    static createCountryUrl(countryCode: string) {
         return `https://gadm.org/maps/${countryCode}.html`;
     }
 
-    static createGADMRegionUrl(countryCode: string, level: number) {
+    static createAdminUrl(countryCode: string, level: number) {
         return `https://gadm.org/maps/${countryCode}_${level}.html`;
     }
 
-    static createGADMGeoJsonDownloadURL(countryCode: string, level: number) {
+    static createGeoJsonDownloadURL(countryCode: string, level: number) {
         return `https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_${countryCode}_${level}.json.zip`;
     }
 
     static async getCatalogRoot(): Promise<DatabaseCatalog>{
-        if(GADMService.catalogRoot == null){
-            GADMService.catalogRoot = await DatabaseCatalog.initialize("GADMDatabaseCatalog", "", false);
+        if(GJService.catalogRoot == null){
+            GJService.catalogRoot = await DatabaseCatalog.initialize("GJDatabaseCatalog", "", false);
         }
-        return GADMService.catalogRoot;
+        return GJService.catalogRoot;
     }
 
     static async listDatabaseNames():Promise<string[]> {
-        return (await (await GADMService.getCatalogRoot()).listNames()).sort();
+        return (await (await GJService.getCatalogRoot()).listNames()).sort();
     }
 
     static async getDefaultDatabaseName():Promise<string> {
-        return (await GADMService.getCatalogRoot()).properties.defaultDatabaseName;
+        return (await GJService.getCatalogRoot()).properties.defaultDatabaseName;
     }
 
     static async setDefaultDatabaseName(databaseName: string):Promise<void> {
-        (await GADMService.getCatalogRoot()).properties.defaultDatabaseName = databaseName;
+        (await GJService.getCatalogRoot()).properties.defaultDatabaseName = databaseName;
     }
 
-    static async createInstance(databaseName: string):Promise<GADMService> {
-        const catalogRoot = await GADMService.getCatalogRoot();
+    static async createInstance(databaseName: string):Promise<GJService> {
+        const catalogRoot = await GJService.getCatalogRoot();
         const catalog = await catalogRoot.get(databaseName) || await catalogRoot.create(databaseName);
         const geojsonDB = getGeoJSONDB(catalog.getIndexedDBName());
         const geoJsonMetadataArray = await geojsonDB.geojsonMetadata.toArray();
@@ -72,7 +72,7 @@ export class GADMService{
                 maxAdminLevel
             };
         });
-        return new GADMService(catalogRoot, geojsonDB, metadataArrayByCountryName, countryMetadataArray, maxAdminLevel);
+        return new GJService(catalog, geojsonDB, metadataArrayByCountryName, countryMetadataArray, maxAdminLevel);
     }
 
     static countMaxAdminLevel(countryMetadataArray: CountryMetadata[]):number {
@@ -198,9 +198,9 @@ export class GADMService{
             Promise.all(new Array<boolean>(countryMetadata.maxAdminLevel + 1).map(async(_: boolean, adminLevel: number) => {
                 if(selectCheckboxMatrix[countryIndex][adminLevel]) {
                     if (adminLevel === 0) {
-                        return GADMService.createGADMCountryUrl(countryMetadata.countryCode);
+                        return GJService.createCountryUrl(countryMetadata.countryCode);
                     } else {
-                        return GADMService.createGADMRegionUrl(countryMetadata.countryCode, adminLevel);
+                        return GJService.createAdminUrl(countryMetadata.countryCode, adminLevel);
                     }
                 }else{
                     return null;

@@ -1,4 +1,7 @@
 import React from "react";
+import { DownloadStatus } from "../types/DownloadStatus";
+import {CircularProgress, Typography } from "@mui/material";
+import { DownloadDone } from "@mui/icons-material";
 
 export const DownloadingIcon = ({
                                     state,

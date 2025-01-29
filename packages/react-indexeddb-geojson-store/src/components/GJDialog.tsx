@@ -5,7 +5,7 @@ import {GJSourcePanel} from "./GJSourcePanel";
 import {CountryMetadata} from "../types/CountryMetadata";
 import {GJSelectPanel} from "./GJSelectPanel";
 import {GJDownloadPanel} from "./GJDownloadPanel";
-import {GADMService} from "../services/GADMService";
+import {GJService} from "../services/GJService";
 import {DatabaseCatalog} from "@eria-viz/indexeddb-catalog";
 import {DownloadStatus} from "../types/DownloadStatus";
 import {GJDialogTitle} from "./GJDialogTitle";
@@ -30,6 +30,9 @@ export const GJDialogCore = ({
   const [footer, setFooter] = useState<ReactNode>(null);
 
   const handleNext = useCallback(() => {
+
+    steps[currentStepIndex].onLeave?.();
+
     if (
       currentStepIndex === 0 ||
       currentStepIndex === 1 ||
@@ -66,7 +69,7 @@ export const GJDialogCore = ({
 
   const databaseCatalogRoot = useRef<DatabaseCatalog>(undefined);
   const databaseCatalog = useRef<DatabaseCatalog>(undefined);
-  const gadmService = useRef<GADMService>(undefined);
+  const service = useRef<GJService>(undefined);
 
   const [databaseNames, setDatabaseNames] = useState<Array<string>>([]);
   const [databaseName, setDatabaseName] = useState<string>("");
@@ -79,7 +82,7 @@ export const GJDialogCore = ({
   }, []);
 
   const initializeStoragePanel = useCallback(async function () {
-    const catalogRoot = await GADMService.getCatalogRoot();
+    const catalogRoot = await GJService.getCatalogRoot();
     if (!catalogRoot) {
       throw new Error("catalogRoot is not found");
     }
@@ -94,38 +97,39 @@ export const GJDialogCore = ({
       await databaseCatalogRoot.current.get(currentDatabaseName);
     if (currentDatabaseName !== "" && catalog !== null) {
       databaseCatalog.current = catalog;
-      gadmService.current = await GADMService.createInstance(catalog.name);
+      service.current = await GJService.createInstance(catalog.name);
     }
-    setDatabaseNames(await GADMService.listDatabaseNames());
+    setDatabaseNames(await GJService.listDatabaseNames());
   }, []);
 
   useEffect(() => {
     initializeStoragePanel();
   }, []);
 
-  const handleAgreeLicense = useCallback((sourceName: string) => {
-    const newLicenseAgreement = {...licenseAgreement};
-    newLicenseAgreement[sourceName] = true;
-    setLicenseAgreement(newLicenseAgreement);
-    focusNextButton();
-  }, []);
-
   const initializeSelectPanel = useCallback(async (content: string) => {
-    if (gadmService.current === undefined) {
-      throw new Error("gadmService is not initialized");
+    if (service.current === undefined) {
+      throw new Error("GJService is not initialized");
     }
 
     const countryMetadataArray =
-      await gadmService.current.updateCountryMetadataArray(content);
+      await service.current.updateCountryMetadataArray(content);
 
-    setMaxAdminLevel(GADMService.countMaxAdminLevel(countryMetadataArray));
+    setMaxAdminLevel(GJService.countMaxAdminLevel(countryMetadataArray));
     setCountryMetadataArray(countryMetadataArray);
-    const downloadedMatrix = await gadmService.current.createDownloadedMatrix()
+    const downloadedMatrix = await service.current.createDownloadedMatrix()
     setDownloadedMatrix(downloadedMatrix);
     setSelectCheckboxMatrix(structuredClone(downloadedMatrix));
   }, []);
 
   const handleDatabaseNameChange = useCallback(async (databaseName: string) => {
+    if (databaseName === "") {
+      throw new Error("databaseName is empty");
+    }
+    setDatabaseName(databaseName);
+    focusNextButton();
+  }, []);
+
+  const createSelectedDatabaseIfNotExists = useCallback(async () => {
     if (databaseName === "") {
       throw new Error("databaseName is empty");
     }
@@ -136,18 +140,15 @@ export const GJDialogCore = ({
       properties: { defaultDatabaseName: databaseName },
     });
     databaseCatalog.current =
-      (await databaseCatalogRoot.current?.get(databaseName)) ||
-      (await databaseCatalogRoot.current?.create(databaseName, "", {}));
-    gadmService.current = await GADMService.createInstance(
-      databaseCatalog.current.name
+        (await databaseCatalogRoot.current?.get(databaseName)) ||
+        (await databaseCatalogRoot.current?.create(databaseName, "", {}));
+    service.current = await GJService.createInstance(
+        databaseCatalog.current.name
     );
-    setDatabaseName(databaseName);
     if (!databaseNames.includes(databaseName)) {
       setDatabaseNames([...databaseNames, databaseName]);
     }
-
-    focusNextButton();
-  }, []);
+  }, [databaseName]);
 
   const [selectedSourceName, setSelectedSourceName] = useState<string>(
       ShapeFileSourceNames.GADM,
@@ -172,6 +173,25 @@ export const GJDialogCore = ({
   const [downloadStatusMatrix, setDownloadStatusMatrix] = useState<
     DownloadStatus[][]
   >([]);
+
+  const initializeLicenseAgreement = useCallback(async () => {
+    if (!service.current) {
+      return;
+    }
+    const catalog = await service.current?.geojsonDBCatalog.get(databaseName);
+    const licenseAgreement = catalog?.properties.licenseAgreement;
+    if(catalog){
+      setLicenseAgreement(licenseAgreement);
+    }
+  }, []);
+
+  const handleAgreeLicense = useCallback((sourceName: string) => {
+    const newLicenseAgreement = {...licenseAgreement};
+    newLicenseAgreement[sourceName] = true;
+    setLicenseAgreement(newLicenseAgreement);
+    service.current?.geojsonDBCatalog.update({properties: {"licenseAgreement": newLicenseAgreement}});
+    focusNextButton();
+  }, []);
 
   const handleCountryIndexPageUrlUpdate = useCallback(
     (indexPageUrl: string) => {
@@ -202,7 +222,7 @@ export const GJDialogCore = ({
     setFooter(undefined);
   }, []);
 
-  const showSelectedCount = useCallback((count: number) => {
+  const showSelectedCountFooter = useCallback((count: number) => {
     if(count == 0) {
       hideFooter();
     }else{
@@ -212,7 +232,7 @@ export const GJDialogCore = ({
 
   const handleSelectedCountChange = useCallback((count: number) => {
     setSelectedCount(count);
-    showSelectedCount(count);
+    showSelectedCountFooter(count);
   }, []);
 
   const initializeDownloadPanel = useCallback(
@@ -220,7 +240,7 @@ export const GJDialogCore = ({
       countryMetadataArray: CountryMetadata[],
       selectCheckboxMatrix: boolean[][],
     ) => {
-      if (!gadmService.current) {
+      if (!service.current) {
         return;
       }
       const downloadCountryMetadataArray = countryMetadataArray.filter(
@@ -254,7 +274,11 @@ export const GJDialogCore = ({
       label: "Storage",
       title: "Select one of the storages to store shape files",
       onEnter: () => {
+        initializeStoragePanel();
         hideFooter();
+      },
+      onLeave: () => {
+        createSelectedDatabaseIfNotExists();
       },
       contents: (
         <GJStoragePanel
@@ -274,7 +298,7 @@ export const GJDialogCore = ({
       label: "Source",
       title: "Select one of the sources hosting shape files",
       onEnter: () => {
-        initializeStoragePanel();
+        initializeLicenseAgreement();
         hideFooter();
       },
       contents: (
@@ -294,7 +318,7 @@ export const GJDialogCore = ({
       title: "Select countries and admin levels to download its shape files",
       onEnter: () => {
         handleCountryIndexPageUrlUpdate(countryIndexPageUrl);
-        showSelectedCount(selectedCount);
+        showSelectedCountFooter(selectedCount);
       },
       contents: (
         <GJSelectPanel

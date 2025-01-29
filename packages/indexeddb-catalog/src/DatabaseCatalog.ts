@@ -6,7 +6,7 @@ export class DatabaseCatalog {
      * Dexie インスタンス（カタログDB用）
      */
     private static dexie: Dexie | null = null;
-    private static ROOT_ID = "ROOT";
+    private static ROOT_ID = "(ROOT)";
     /**
      * ディレクトリテーブル
      */
@@ -251,7 +251,7 @@ export class DatabaseCatalog {
      * @param description 作成するエントリの説明
      * @returns 作成された子エントリを示す DatabaseCatalog
      */
-    public async create(name: string, description: string = "", properties: {[key:string]:string} = {}): Promise<DatabaseCatalog> {
+    public async create(name: string, description: string = "", properties: {[key:string]:any} = {}): Promise<DatabaseCatalog> {
         if (!DatabaseCatalog.directory) {
             throw new Error("DatabaseCatalog is not initialized.");
         }
@@ -281,7 +281,7 @@ export class DatabaseCatalog {
         return `${this.name}-${this.uuid}`;
     }
 
-    public async update({description, properties}:{description?: string, properties?: {[key:string]:string}}): Promise<void> {
+    public async update({description, properties}:{description?: string, properties?: {[key:string]:any}}): Promise<void> {
         if (!DatabaseCatalog.directory) {
             throw new Error("DatabaseCatalog is not initialized.");
         }
@@ -291,7 +291,6 @@ export class DatabaseCatalog {
         }
         description && (entry.description = description);
         properties && (entry.properties = properties);
-        console.log('*** updating: ', entry);
         await DatabaseCatalog.directory.put(entry);
     }
 

@@ -9,5 +9,5 @@ export interface DirectoryEntry {
     parent: string;
     name: string;
     description: string;
-    properties: {[key:string]:string};
+    properties: {[key:string]:any};
 }

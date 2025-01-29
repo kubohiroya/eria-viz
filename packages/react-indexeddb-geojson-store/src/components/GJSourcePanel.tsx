@@ -12,8 +12,9 @@ import {
 } from "@mui/material";
 import { InlineIcon } from "./InlineIcon/InlineIcon";
 import { Launch } from "@mui/icons-material";
-import { GADMSourcePanelProps, SourceMetadata } from "./GADMSourcePanelProps";
+import { GJSourcePanelProps, SourceMetadata } from "./GJSourcePanelProps";
 import { Link } from "react-router";
+import { ShapeFileSourceNames } from "./ShapeFileSources";
 
 export const GJSourcePanelCore = ({
   selectedSourceName,
@@ -21,7 +22,7 @@ export const GJSourcePanelCore = ({
   sourceNameArray,
   sources,
   agreeLicense,
-}: GADMSourcePanelProps) => {
+}: GJSourcePanelProps) => {
   const getEntry = (): SourceMetadata => {
     return (
       (selectedSourceName && sources.get(selectedSourceName)) || {
@@ -53,7 +54,7 @@ export const GJSourcePanelCore = ({
               setSelectedSourceName(event.target.value as string);
             }}
           >
-            {sourceNameArray.map((sourceName, index) => (
+            {sourceNameArray.map((sourceName: string, index: number) => (
               <MenuItem key={index} value={sourceName}>
                 {sources.get(sourceName)?.sourceName}
               </MenuItem>

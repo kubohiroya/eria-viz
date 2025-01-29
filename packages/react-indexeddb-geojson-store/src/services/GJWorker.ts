@@ -1,7 +1,7 @@
 import dexie from "dexie";
 import { CountryMetadata } from "../types/CountryMetadata";
 import { download } from "@eria-viz/download";
-import { GADMService } from "./GADMService";
+import { GJService } from "./GJService";
 
 type DownloadTarget = {
   url: string;
@@ -32,7 +32,7 @@ export async function downloadGeoJSON(
         (checked: boolean, adminLevel: number) => {
           if (checked) {
             return {
-              url: GADMService.createGADMGeoJsonDownloadURL(
+              url: GJService.createGeoJsonDownloadURL(
                 countryMetadata.countryCode,
                 adminLevel,
               ),
