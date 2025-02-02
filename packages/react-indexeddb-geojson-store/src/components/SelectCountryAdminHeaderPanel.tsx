@@ -1,9 +1,9 @@
-import { Checkbox, TableCell, Typography } from "@mui/material";
+import { Checkbox, TableCell, TableRow, Typography } from "@mui/material";
 import React, { memo } from "react";
 import { createNumberArray } from "../utils/arrayUtils";
-import { GJIcon } from "./GJIcon";
+import { ShapeIcon } from "./ShapeIcon";
 
-const GJSelectHeaderPanelCore = ({
+const SelectCountryAdminHeaderPanelCore = ({
   maxAdminLevel,
   northWestHeaderChecked,
   northWestHeaderIndetermined,
@@ -22,7 +22,8 @@ const GJSelectHeaderPanelCore = ({
 }) => {
   return (
     <>
-      <TableCell key="-1" component="th" scope="row">
+      <TableRow style={{background: "#f5f5f5"}}>
+      <TableCell key="-1" scope="row" sx={{ width: 1 / 4 }} >
         <Checkbox
           checked={northWestHeaderChecked}
           indeterminate={northWestHeaderIndetermined}
@@ -32,17 +33,18 @@ const GJSelectHeaderPanelCore = ({
         <Typography sx={{ fontStyle: "bold" }}>Select/Unselect All</Typography>
       </TableCell>
       {createNumberArray(maxAdminLevel).map((level) => (
-        <TableCell key={level} component="th" scope="row">
+        <TableCell key={level} scope="row" sx={{ width: 3 / 20}}>
           <Checkbox
             checked={columnHeaderChecked[level] ?? false}
             indeterminate={columnHeaderIndetermined[level] ?? false}
             onChange={handleColumnHeaderCheckboxChange(level)}
             name={`${level}`}
           />
-          <GJIcon level={level} />
+          <ShapeIcon level={level} />
         </TableCell>
       ))}
+      </TableRow>
     </>
   );
 };
-export const GJSelectHeaderPanel = memo(GJSelectHeaderPanelCore);
+export const SelectCountryAdminHeaderPanel = memo(SelectCountryAdminHeaderPanelCore);

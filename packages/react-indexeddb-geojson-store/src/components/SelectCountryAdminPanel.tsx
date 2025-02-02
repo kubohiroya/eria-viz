@@ -1,37 +1,44 @@
 import {
   Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Link,
   styled,
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableRow,
   TextField,
+  Typography,
 } from "@mui/material";
-import React, { memo, useCallback, useEffect, useMemo } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { CountryMetadata } from "../types/CountryMetadata";
 import { produce } from "immer";
-import { GJSelectHeaderPanel } from "./GJSelectHeaderPanel";
-import { GJSelectBodyPanel } from "./GJSelectBodyPanel";
-import { CheckboxState, GJService } from "../services/GJService";
-
+import { SelectCountryAdminHeaderPanel } from "./SelectCountryAdminHeaderPanel";
+import { CheckboxState, GeoJsonService } from "../services/GeoJsonService";
+import {TableVirtuoso} from "react-virtuoso";
+import { SelectCountryAdminBodyRow } from "./SelectCountryAdminBodyRow";
+/*
 const SelectorTable = styled(Table)`
   & > tbody > tr > td {
     background-color: rgba(245, 245, 245);
   }
 `;
+ */
 
-interface GJResourceSelectorPanelProps {
+interface SelectCountryAdminPanelProps {
   downloadedMatrix: boolean[][];
   checkboxMatrix: boolean[][];
   countryIndexPageUrl: string;
-  readonly countryMetadataArray: CountryMetadata[];
-  readonly maxAdminLevel: number;
+  countryMetadataArray: CountryMetadata[];
+  maxAdminLevel: number;
   handleCheckedCountChange: (count: number) => void;
   handleCheckboxMatrixChange: (matrix: boolean[][]) => void;
-  handleCountryIndexPageUrlChange: (url: string) => void;
 }
 
-const GJSelectPanelCore = ({
+const SelectCountryAdminPanelCore = ({
   downloadedMatrix,
   checkboxMatrix,
   countryIndexPageUrl,
@@ -39,23 +46,47 @@ const GJSelectPanelCore = ({
   maxAdminLevel,
   handleCheckedCountChange,
   handleCheckboxMatrixChange,
-  handleCountryIndexPageUrlChange,
-}: GJResourceSelectorPanelProps) => {
-  const handleContryIndexPageUrlChanged = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    handleCountryIndexPageUrlChange(event.target.value);
-  };
+}: SelectCountryAdminPanelProps) => {
+
+  const virtuoso = useRef(null);
 
   const headerCheckboxState = useMemo(
     () =>
-      GJService.createHeaderCheckboxState(
+      GeoJsonService.createHeaderCheckboxState(
         checkboxMatrix,
         maxAdminLevel,
         countryMetadataArray,
       ),
     [checkboxMatrix, maxAdminLevel, countryMetadataArray],
   );
+
+  const IndexTable = () => {
+    const map = new Map<string, number>();
+    countryMetadataArray.forEach((countryMetadata, index) => {
+      const chr = countryMetadata.countryName.charAt(0);
+      if (!map.has(chr)) {
+        map.set(chr, index);
+      }
+    });
+    return (
+        <Box style={{display: "flex", justifyContent: "center", gap: "2px", marginTop: "10px", paddingTop: "4px",
+           background: "#f5f5f5"}}>
+        {
+          ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map((char: string) => (
+            <IconButton
+              size='small'
+              key={char}
+              onClick={() => {
+                (virtuoso.current as any).scrollToIndex({index: map.get(char) ?? 0, behavior: "auto"})
+              }}
+            >{char}
+            </IconButton>
+          ))
+        }
+        </Box>
+    );
+  }
 
   useEffect(() => {
     handleCheckedCountChange(headerCheckboxState.checkedCount);
@@ -143,16 +174,32 @@ const GJSelectPanelCore = ({
     <>
       <TextField
         fullWidth
+        aria-readonly
         id="countryIndexPageUrl"
         label="Country Index Page URL"
         value={countryIndexPageUrl}
-        onChange={handleContryIndexPageUrlChanged}
       />
+      <IndexTable />
       <Box>
-        <SelectorTable stickyHeader size="small">
-          <TableHead>
-            <TableRow>
-              <GJSelectHeaderPanel
+        {(checkboxMatrix.length === 0)?
+        (
+
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            margin: "20px",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+  ):(
+  <TableVirtuoso
+    ref={virtuoso}
+    style={{ height: 500 }}
+    fixedHeaderContent={()=>
+            (
+              <SelectCountryAdminHeaderPanel
                 maxAdminLevel={maxAdminLevel}
                 northWestHeaderChecked={
                   headerCheckboxState.northWestHeader === CheckboxState.Checked
@@ -171,11 +218,35 @@ const GJSelectPanelCore = ({
                 handleColumnHeaderCheckboxChange={
                   handleColumnHeaderCheckboxChange
                 }
+              />)
+          }
+          data={countryMetadataArray}
+          itemContent={(index, countryMetadata) => (
+              <SelectCountryAdminBodyRow
+                maxAdminLevel={maxAdminLevel}
+                downloadedMatrix={downloadedMatrix}
+                checkboxMatrix={checkboxMatrix}
+                item={countryMetadata}
+                headerCheckboxState={headerCheckboxState}
+                dataIndex={index}
+                handleRowHeaderCheckboxChangeFactory={
+                  handleRowHeaderCheckboxChangeFactory
+                }
+                handleCheckboxMatrixChangeFactory={
+                  handleCheckboxMatrixChangeFactory
+                }
               />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <GJSelectBodyPanel
+          )}
+        />)}
+      </Box>
+    </>
+  );
+};
+export const SelectCountryAdminPanel = memo(SelectCountryAdminPanelCore);
+
+/*
+        />
+            <SelectCountryAdminBodyPanel
               maxAdminLevel={maxAdminLevel}
               rowHeaderChecked={headerCheckboxState.rowHeader.map(
                 (state) => state === CheckboxState.Checked,
@@ -193,10 +264,6 @@ const GJSelectPanelCore = ({
                 handleCheckboxMatrixChangeFactory
               }
             />
-          </TableBody>
-        </SelectorTable>
-      </Box>
-    </>
-  );
-};
-export const GJSelectPanel = memo(GJSelectPanelCore);
+      }
+
+ */

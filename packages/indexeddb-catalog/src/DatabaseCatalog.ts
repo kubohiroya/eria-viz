@@ -93,12 +93,15 @@ export class DatabaseCatalog {
         let rootEntry = await dirTable.get({ parent: DatabaseCatalog.ROOT_ID, name: catalogDatabaseName });
         if (!rootEntry) {
             // まだ存在しないなら作成
+            const now = Date.now();
             rootEntry = {
                 uuid: crypto.randomUUID(),
                 parent: DatabaseCatalog.ROOT_ID,
                 name: catalogDatabaseName,
                 description: description,
-                properties: {}
+                properties: {},
+                createdAt: now,
+                updatedAt: now
             };
             await dirTable.add(rootEntry);
         }
@@ -264,12 +267,15 @@ export class DatabaseCatalog {
 
         // 新規エントリを作成
         const newUuid = crypto.randomUUID();
+        const now = Date.now();
         const newEntry: DirectoryEntry = {
             uuid: newUuid,
             parent: this.uuid,
             name,
             description,
-            properties
+            properties,
+            createdAt: now,
+            updatedAt: now
         };
         await DatabaseCatalog.directory.add(newEntry);
 
@@ -291,6 +297,7 @@ export class DatabaseCatalog {
         }
         description && (entry.description = description);
         properties && (entry.properties = properties);
+        entry.updatedAt = Date.now();
         await DatabaseCatalog.directory.put(entry);
     }
 

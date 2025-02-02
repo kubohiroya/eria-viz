@@ -14,7 +14,7 @@ export class GeoJSONDB extends Dexie {
     super(databaseName);
     this.version(1).stores({
       geojsonData: '++id',
-      geojsonMetadata: '++id,originalUrl,countryCode,countryName,adminName1,adminName2,adminLevel,[countryName+adminLevel]',
+      geojsonMetadata: '++id,sourceName,originalUrl,countryCode,countryName,adminName1,adminName2,adminLevel,[countryName+adminLevel]',
       geojsonInfo: '++id,precision,areaThreshold',
       geojsonIndex: '++id,dataIdref,metadataIdref,infoIdref,z2,z3,z4,z5,z6,z7,z8,z9',
     });

@@ -1,6 +1,6 @@
 import React, {memo, ReactNode, useCallback, useEffect, useRef, useState} from "react";
 import {Alert, Box, Card, CardActionArea, CardContent, Dialog, DialogContent, Typography,} from "@mui/material";
-import {GJStoragePanel} from "./GJStoragePanel";
+import {StorageBundleSelectPanel} from "./StorageBundleSelectPanel";
 import {GJSourcePanel} from "./GJSourcePanel";
 import {CountryMetadata} from "../types/CountryMetadata";
 import {GJSelectPanel} from "./GJSelectPanel";
@@ -14,18 +14,17 @@ import {GJDialogActions} from "./GJDialogActions";
 import {GJDialogStepTitle} from "./GJDialogStepTitle";
 import { GJDialogProps } from "./GJDialogProps";
 import { ShapeFileSourceNames, ShapeFileSources, ShapreFileSourceNameArray } from "./ShapeFileSources";
-
+import { Outlet } from "react-router";
 
 export const GJDialogCore = ({
-  setShowDialog,
+  closeDialog,
 }: GJDialogProps) => {
   const nextButtonRef = useRef<HTMLButtonElement>(null);
-
-  const hideDialog = useCallback(() => setShowDialog(false), [setShowDialog]);
-
+  /*
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0); //FIXME
   const [completedStepIndex, setCompletedStepIndex] = useState<number>(0);
   const [allStepsCompleted, setAllStepsCompleted] = useState<boolean>(false);
+   */
 
   const [footer, setFooter] = useState<ReactNode>(null);
 
@@ -52,12 +51,12 @@ export const GJDialogCore = ({
   const handleFinished = useCallback(() => {
     // FIXME !!!!!!
     console.log("FINISHED!");
-    hideDialog();
+    closeDialog();
   }, []);
 
   const handleBack = useCallback(() => {
     if (currentStepIndex == 0) {
-      hideDialog();
+      closeDialog();
       return;
     }
     if (currentStepIndex > 0) {
@@ -73,7 +72,7 @@ export const GJDialogCore = ({
 
   const [databaseNames, setDatabaseNames] = useState<Array<string>>([]);
   const [databaseName, setDatabaseName] = useState<string>("");
-  const [downloadedMatrix, setDownloadedMatrix] = useState<boolean[][]>([]);
+  // const [downloadedMatrix, setDownloadedMatrix] = useState<boolean[][]>([]);
 
   const focusNextButton = useCallback(() => {
     setTimeout(() => {
@@ -171,7 +170,7 @@ export const GJDialogCore = ({
   const [downloadCountryMetadataArray, setDownloadCountryMetadataArray] =
     useState<CountryMetadata[]>([]);
   const [downloadStatusMatrix, setDownloadStatusMatrix] = useState<
-    DownloadStatus[][]
+      DownloadStatus[][]
   >([]);
 
   const initializeLicenseAgreement = useCallback(async () => {
@@ -281,7 +280,7 @@ export const GJDialogCore = ({
         createSelectedDatabaseIfNotExists();
       },
       contents: (
-        <GJStoragePanel
+        <GJSelectedStoragePanel
           databaseNames={databaseNames}
           databaseName={databaseName}
           handleDatabaseNameChange={handleDatabaseNameChange}
@@ -290,7 +289,7 @@ export const GJDialogCore = ({
             Please enter new storage name or select one of the preexisting
             storages to store shape files:
           </Alert>
-        </GJStoragePanel>
+        </GJSelectedStoragePanel>
       ),
       isNextButtonEnabled: () => databaseName !== "",
     },
@@ -303,12 +302,12 @@ export const GJDialogCore = ({
       },
       contents: (
         <GJSourcePanel
-          selectedSourceName={selectedSourceName}
-          setSelectedSourceName={setSelectedSourceName}
-          sources={ShapeFileSources}
-          sourceNameArray={ShapreFileSourceNameArray}
-          licenseAgreement={licenseAgreement}
-          agreeLicense={handleAgreeLicense}
+            selectedSourceName={selectedSourceName}
+            setSelectedSourceName={setSelectedSourceName}
+            sources={ShapeFileSources}
+            sourceNameArray={ShapreFileSourceNameArray}
+            licenseAgreement={licenseAgreement}
+            agreeLicense={handleAgreeLicense}
         />
       ),
       isNextButtonEnabled: () => licenseAgreement[selectedSourceName] ?? false,
@@ -376,7 +375,7 @@ export const GJDialogCore = ({
                     label={steps[currentStepIndex]?.label}
                     title={steps[currentStepIndex]?.title}
                 />
-                {steps[currentStepIndex]?.contents}
+                <Outlet/>
               </CardContent>
               <CardActionArea></CardActionArea>
             </Card>
@@ -384,7 +383,7 @@ export const GJDialogCore = ({
         </Box>
       </DialogContent>
       <GJDialogActions
-        hideDialog={hideDialog}
+        closeDialog={closeDialog}
         handleBack={handleBack}
         handleNext={handleNext}
         currentStepIndex={currentStepIndex}
@@ -398,3 +397,4 @@ export const GJDialogCore = ({
 };
 
 export const GJDialog = memo(GJDialogCore);
+

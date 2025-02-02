@@ -10,4 +10,6 @@ export interface DirectoryEntry {
     name: string;
     description: string;
     properties: {[key:string]:any};
+    createdAt: number;
+    updatedAt: number;
 }

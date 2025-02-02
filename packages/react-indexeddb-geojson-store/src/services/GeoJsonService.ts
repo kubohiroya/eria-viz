@@ -1,8 +1,6 @@
-import {GeoJSONDB, GeoJSONMetadata, getGeoJSONDB} from "@eria-viz/indexeddb-geojson";
+import {GeoJSONDB, getGeoJSONDB} from "@eria-viz/indexeddb-geojson";
 import {DatabaseCatalog} from "@eria-viz/indexeddb-catalog";
-import {groupBy} from "../utils/arrayUtils";
 import {CountryMetadata} from "../types/CountryMetadata";
-import {DownloadStatus} from "../types/DownloadStatus";
 
 export enum CheckboxState {
     Unchecked,
@@ -17,15 +15,12 @@ export type HeaderCheckboxState = {
     checkedCount: number;
 };
 
-export class GJService {
+export class GeoJsonService {
 
-    static catalogRoot: DatabaseCatalog;
-
-    geojsonDBCatalog: DatabaseCatalog;
+    static _rootCatalog: DatabaseCatalog;
+    rootCatalog: DatabaseCatalog;
+    catalog: DatabaseCatalog;
     geojsonDB: GeoJSONDB;
-    metadataArrayByCountryName: Map<string,GeoJSONMetadata[]>;
-    countryMetadataArray: CountryMetadata[];
-    maxAdminLevel: number;
 
     static createCountryUrl(countryCode: string) {
         return `https://gadm.org/maps/${countryCode}.html`;
@@ -39,40 +34,29 @@ export class GJService {
         return `https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_${countryCode}_${level}.json.zip`;
     }
 
-    static async getCatalogRoot(): Promise<DatabaseCatalog>{
-        if(GJService.catalogRoot == null){
-            GJService.catalogRoot = await DatabaseCatalog.initialize("GJDatabaseCatalog", "", false);
+    static async getRootCatalog(): Promise<DatabaseCatalog>{
+        if(GeoJsonService._rootCatalog == null){
+            GeoJsonService._rootCatalog = await DatabaseCatalog.initialize("GJDatabaseCatalog", "", false);
         }
-        return GJService.catalogRoot;
+        return GeoJsonService._rootCatalog;
     }
 
-    static async listDatabaseNames():Promise<string[]> {
-        return (await (await GJService.getCatalogRoot()).listNames()).sort();
-    }
-
-    static async getDefaultDatabaseName():Promise<string> {
-        return (await GJService.getCatalogRoot()).properties.defaultDatabaseName;
-    }
-
-    static async setDefaultDatabaseName(databaseName: string):Promise<void> {
-        (await GJService.getCatalogRoot()).properties.defaultDatabaseName = databaseName;
-    }
-
-    static async createInstance(databaseName: string):Promise<GJService> {
-        const catalogRoot = await GJService.getCatalogRoot();
-        const catalog = await catalogRoot.get(databaseName) || await catalogRoot.create(databaseName);
+    static async createInstance(databaseName: string):Promise<GeoJsonService> {
+        const rootCatalog = await GeoJsonService.getRootCatalog();
+        const catalog = await rootCatalog.get(databaseName) || await rootCatalog.create(databaseName);
         const geojsonDB = getGeoJSONDB(catalog.getIndexedDBName());
-        const geoJsonMetadataArray = await geojsonDB.geojsonMetadata.toArray();
-        const metadataArrayByCountryName = groupBy({source: geoJsonMetadataArray, key: "countryName"});
-        const maxAdminLevel = catalogRoot.properties.maxAdminLevel;
-        const countryMetadataArray: CountryMetadata[] = geoJsonMetadataArray.map((geoJsonMetadata: GeoJSONMetadata) => {
-            return {
-                countryName: geoJsonMetadata.countryName,
-                countryCode: geoJsonMetadata.countryCode,
-                maxAdminLevel
-            };
-        });
-        return new GJService(catalog, geojsonDB, metadataArrayByCountryName, countryMetadataArray, maxAdminLevel);
+        // const geoJsonMetadataArray = await geojsonDB.geojsonMetadata.toArray();
+        return new GeoJsonService(rootCatalog, catalog, geojsonDB);
+    }
+
+    static async listDatabaseNames(): Promise<string[]> {
+        const rootCatalog = await GeoJsonService.getRootCatalog();
+        return (await rootCatalog.listNames()).sort();
+    }
+
+    static async getDefaultDatabaseName(): Promise<string> {
+        const rootCatalog = await GeoJsonService.getRootCatalog();
+        return rootCatalog.properties.defaultDatabaseName;
     }
 
     static countMaxAdminLevel(countryMetadataArray: CountryMetadata[]):number {
@@ -150,42 +134,17 @@ export class GJService {
         return result;
     }
 
-    constructor(geojsonDBCatalog: DatabaseCatalog, geojsonDB: GeoJSONDB, metadataArrayByCountryName: Map<string,GeoJSONMetadata[]>, countryMetadataArray: CountryMetadata[], maxAdminLevel: number) {
-        this.geojsonDBCatalog = geojsonDBCatalog;
+    constructor(rootCatalog: DatabaseCatalog, catalog: DatabaseCatalog, geojsonDB: GeoJSONDB) {
+        this.rootCatalog = rootCatalog;
+        this.catalog = catalog;
         this.geojsonDB = geojsonDB;
-        this.metadataArrayByCountryName = metadataArrayByCountryName;
-        this.countryMetadataArray = countryMetadataArray;
-        this.maxAdminLevel = maxAdminLevel;
     }
 
-    async updateCountryMetadataArray(content: string):Promise<CountryMetadata[]> {
-        const doc = new DOMParser().parseFromString(content, 'text/html');
-        const select = doc.getElementById('countrySelect');
-        if(select === null){
-            throw new Error();
-        }
-        const countryMetadataArray: CountryMetadata[] = [];
-        let index = 0;
-        for(let i = 0; i < select.children.length; i++){
-            const option = select.children.item(i);
-            if(option === null){
-                continue;
-            }
-            const value = option.getAttribute("value");
-            if(value === null || !(value.includes("_"))) {
-                continue;
-            }
-            const [countryCode, countryName, maxAdminLevel] = option.getAttribute("value")!.split('_');
-            countryMetadataArray.push({
-                countryName,
-                countryCode,
-                maxAdminLevel: parseInt(maxAdminLevel),
-            });
-        }
-        this.countryMetadataArray = countryMetadataArray;
-        return countryMetadataArray;
+    setDefaultDatabaseName(databaseName: string): void {
+        this.rootCatalog.update({properties:{defaultDatabaseName: databaseName}});
     }
 
+    /*
     public async createDownloadedMatrix():Promise<boolean[][]> {
         return await Promise.all(this.countryMetadataArray.map((countryMetadata: CountryMetadata) =>
             Promise.all(new Array<boolean>(countryMetadata.maxAdminLevel + 1).map(async(_: boolean, adminLevel: number) =>
@@ -198,9 +157,9 @@ export class GJService {
             Promise.all(new Array<boolean>(countryMetadata.maxAdminLevel + 1).map(async(_: boolean, adminLevel: number) => {
                 if(selectCheckboxMatrix[countryIndex][adminLevel]) {
                     if (adminLevel === 0) {
-                        return GJService.createCountryUrl(countryMetadata.countryCode);
+                        return GeoJsonService.createCountryUrl(countryMetadata.countryCode);
                     } else {
-                        return GJService.createAdminUrl(countryMetadata.countryCode, adminLevel);
+                        return GeoJsonService.createAdminUrl(countryMetadata.countryCode, adminLevel);
                     }
                 }else{
                     return null;
@@ -226,7 +185,7 @@ export class GJService {
             // FIXME
         })();
     }
-    /*
+
     countryMetadataArray
 .filter((item: CountryMetadata, rowIndex: number)=>{
     return checkboxMatrix[rowIndex].some((checked: boolean)=>checked);

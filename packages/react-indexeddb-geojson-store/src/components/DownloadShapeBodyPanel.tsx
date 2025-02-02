@@ -3,10 +3,10 @@ import React, {memo} from "react";
 import {CountryMetadata} from "../types/CountryMetadata";
 import {createNumberArray} from "../utils/arrayUtils";
 import {DownloadStatus} from "../types/DownloadStatus";
-import {GJService} from "../services/GJService";
+import {GeoJsonService} from "../services/GeoJsonService";
 import { DownloadingIcon } from "./DownloadingIcon";
 
-const GJDownloadBodyPanelCore = ({
+const DownloadShapeBodyPanelCore = ({
   maxAdminLevel,
   downloadCountryMetadataArray,
   downloadStatusMatrix,
@@ -27,7 +27,7 @@ const GJDownloadBodyPanelCore = ({
         <TableRow key={dataIndex}>
         <TableCell component="th" scope="row" >
           <a
-            href={GJService.createCountryUrl(item.countryCode)}
+            href={GeoJsonService.createCountryUrl(item.countryCode)}
             target="_blank"
             rel="noreferrer"
           >
@@ -47,4 +47,4 @@ const GJDownloadBodyPanelCore = ({
     ),
   );
 };
-export const GJDownloadBodyPanel = memo(GJDownloadBodyPanelCore);
+export const DownloadShapeBodyPanel = memo(DownloadShapeBodyPanelCore);

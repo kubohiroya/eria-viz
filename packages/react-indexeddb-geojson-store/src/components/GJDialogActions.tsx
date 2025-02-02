@@ -2,27 +2,25 @@ import { Close } from "@mui/icons-material"
 import {Box, Button, DialogActions, IconButton, Typography } from "@mui/material"
 import React, { ReactNode } from "react"
 import { memo } from "react"
+import { useDialogContext } from "../hooks/useDialogContext"
 
 type GJActionsProps = {
-    hideDialog: ()=>void
+    closeDialog: ()=>void
     handleBack: ()=>void
     handleNext: ()=>void
-    currentStepIndex: number
-    isNextButtonEnabled: boolean,
     numSteps: number,
-    footer: ReactNode,
     nextButtonRef: any
 }
 const GJDialogActionsCore = ({
-    hideDialog,
+    closeDialog: closeDialog,
     handleBack,
     handleNext,
-    currentStepIndex,
-                                   isNextButtonEnabled,
-                                   numSteps,
-    footer,
+                                 numSteps,
     nextButtonRef
                                }: GJActionsProps)=>{
+
+    const {isNextButtonEnabled, currentStepIndex, footer} = useDialogContext();
+
     return (
         <DialogActions sx={{ margin: "10px" }}>
             <IconButton
@@ -32,7 +30,7 @@ const GJDialogActionsCore = ({
                     top: "-4px",
                     right: "-4px",
                 }}
-                onClick={hideDialog}
+                onClick={closeDialog}
             >
                 <Close style={{ width: "40px", height: "40px" }} />
             </IconButton>
@@ -56,7 +54,7 @@ const GJDialogActionsCore = ({
                 title={
                     currentStepIndex < numSteps - 1
                         ? `Step ${currentStepIndex + 1}`
-                        : "Finish"
+                        : 'Finish'
                 }
                 onClick={handleNext}
                 ref={nextButtonRef}

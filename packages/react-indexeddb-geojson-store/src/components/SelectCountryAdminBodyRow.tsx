@@ -5,10 +5,10 @@ import {
   TableCell,
   TableRow,
 } from "@mui/material";
-import React, { memo } from "react";
+import React from "react";
 import { CountryMetadata } from "../types/CountryMetadata";
 import { createNumberArray } from "../utils/arrayUtils";
-import { GJService } from "../services/GJService";
+import {CheckboxState, GeoJsonService, HeaderCheckboxState } from "../services/GeoJsonService";
 import { FileDownload, FileDownloadDone } from "@mui/icons-material";
 import { InlineIcon } from "./InlineIcon/InlineIcon";
 
@@ -56,57 +56,43 @@ const FileAlreadyDownloadedIcon = () => {
   );
 };
 
-const GJSelectBodyPanelCore = ({
+export const SelectCountryAdminBodyRow = ({
+                                            item,
+                                            dataIndex,
   maxAdminLevel,
-  rowHeaderChecked,
-  rowHeaderIndetermined,
+  headerCheckboxState,
   downloadedMatrix,
   checkboxMatrix,
-  countryMetadataArray,
   handleRowHeaderCheckboxChangeFactory,
   handleCheckboxMatrixChangeFactory,
 }: {
+  item: CountryMetadata;
+  dataIndex: number;
   maxAdminLevel: number;
-  rowHeaderChecked: boolean[];
-  rowHeaderIndetermined: boolean[];
+  headerCheckboxState: HeaderCheckboxState;
   downloadedMatrix: boolean[][];
   checkboxMatrix: boolean[][];
-  countryMetadataArray: CountryMetadata[];
   handleRowHeaderCheckboxChangeFactory: (rowIndex: number) => () => void;
   handleCheckboxMatrixChangeFactory: (
     rowIndex: number,
     columnIndex: number,
   ) => () => void;
 }) => {
-  if (checkboxMatrix.length === 0) {
-    return (
-      <TableRow>
-        <TableCell component="th" scope="row" colSpan={maxAdminLevel + 1}>
-          <Box
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              margin: "20px",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        </TableCell>
-      </TableRow>
-    );
-  }
 
-  return countryMetadataArray.map((item, dataIndex) => (
-    <TableRow key={dataIndex}>
-      <TableCell component="th" scope="row">
+  const rowHeaderChecked = headerCheckboxState.rowHeader[dataIndex] === CheckboxState.Checked
+  const rowHeaderIndetermined = headerCheckboxState.rowHeader[dataIndex] === CheckboxState.Indeterminate
+
+  return (
+    <>
+      <TableCell component="th" scope="row" sx={{ width: 1 / 4 }}>
         <Checkbox
-          checked={rowHeaderChecked[dataIndex] ?? false}
-          indeterminate={rowHeaderIndetermined[dataIndex] ?? false}
+          checked={rowHeaderChecked ?? false}
+          indeterminate={rowHeaderIndetermined ?? false}
           onChange={handleRowHeaderCheckboxChangeFactory(dataIndex)}
           name={dataIndex.toString()}
         />
         <a
-          href={GJService.createCountryUrl(item.countryCode)}
+          href={GeoJsonService.createCountryUrl(item.countryCode)}
           target="_blank"
           rel="noreferrer"
         >
@@ -114,7 +100,7 @@ const GJSelectBodyPanelCore = ({
         </a>
       </TableCell>
       {createNumberArray(maxAdminLevel).map((level: number) => (
-        <TableCell key={level}>
+        <TableCell key={level} sx={{ width: 3 / 20 }}>
           {level <= item.maxAdminLevel && (
             <>
               <Checkbox
@@ -130,7 +116,7 @@ const GJSelectBodyPanelCore = ({
                 ) : (
                   level === 0 && (
                     <a
-                      href={GJService.createCountryUrl(item.countryCode)}
+                      href={GeoJsonService.createCountryUrl(item.countryCode)}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -140,7 +126,7 @@ const GJSelectBodyPanelCore = ({
                 )}
                 {level === 1 && (
                   <a
-                    href={GJService.createAdminUrl(
+                    href={GeoJsonService.createAdminUrl(
                       item.countryCode,
                       level,
                     )}
@@ -155,8 +141,7 @@ const GJSelectBodyPanelCore = ({
           )}
         </TableCell>
       ))}
-    </TableRow>
-  ));
+    </>
+  );
 };
 
-export const GJSelectBodyPanel = memo(GJSelectBodyPanelCore);

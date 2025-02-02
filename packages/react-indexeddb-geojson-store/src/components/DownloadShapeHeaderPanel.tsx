@@ -1,9 +1,9 @@
 import { TableCell } from "@mui/material";
 import React, { memo } from "react";
 import { createNumberArray } from "../utils/arrayUtils";
-import { GJIcon } from "./GJIcon";
+import { ShapeIcon } from "./ShapeIcon";
 
-const GADMDownloadHeaderPanelCore = ({
+const DownloadShapeHeaderPanelCore = ({
   maxAdminLevel,
 }: {
   maxAdminLevel: number;
@@ -13,10 +13,10 @@ const GADMDownloadHeaderPanelCore = ({
       <TableCell key="-1" component="th" scope="row"></TableCell>
       {createNumberArray(maxAdminLevel).map((level) => (
         <TableCell key={level} component="th" scope="row" align="center">
-          <GJIcon level={level} />
+          <ShapeIcon level={level} />
         </TableCell>
       ))}
     </>
   );
 };
-export const GJDownloadHeaderPanel = memo(GADMDownloadHeaderPanelCore);
+export const DownloadShapeHeaderPanel = memo(DownloadShapeHeaderPanelCore);

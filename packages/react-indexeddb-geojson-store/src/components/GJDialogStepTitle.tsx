@@ -10,9 +10,7 @@ export const GJDialogStepTitle = ({label, title}: {label: string, title: string}
                 marginBottom: "16px",
             }}
         >
-            {label}
-                 :
-            {title}
+            {label}: {' '}{title}
         </Typography>
     );
 }

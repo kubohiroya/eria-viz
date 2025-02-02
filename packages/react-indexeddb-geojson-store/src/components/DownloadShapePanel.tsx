@@ -1,25 +1,25 @@
 import React from "react";
 import { memo } from "react";
-import { GJDownloadPanelProps } from "./GJDownloadPanelProps";
+import { DownloadShapePanelProps } from "./DownloadShapePanelProps";
 import { Table, TableBody, TableHead, TableRow } from "@mui/material";
-import { GJDownloadHeaderPanel } from "./GJDownloadHeaderPanel";
-import { GJDownloadBodyPanel } from "./GJDownloadBodyPanel";
+import { DownloadShapeHeaderPanel } from "./DownloadShapeHeaderPanel";
+import { DownloadShapeBodyPanel } from "./DownloadShapeBodyPanel";
 
-export const GJDownloadPanelCore = ({
+export const DownloadShapePanelCore = ({
   maxAdminLevel,
   downloadCountryMetadataArray,
   downloadStatusMatrix,
-}: GJDownloadPanelProps) => {
+}: DownloadShapePanelProps) => {
   return (
     <>
       <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
-            <GJDownloadHeaderPanel maxAdminLevel={maxAdminLevel} />
+            <DownloadShapeHeaderPanel maxAdminLevel={maxAdminLevel} />
           </TableRow>
         </TableHead>
         <TableBody>
-          <GJDownloadBodyPanel
+          <DownloadShapeBodyPanel
             maxAdminLevel={maxAdminLevel}
             downloadCountryMetadataArray={downloadCountryMetadataArray}
             downloadStatusMatrix={downloadStatusMatrix}
@@ -29,4 +29,4 @@ export const GJDownloadPanelCore = ({
     </>
   );
 };
-export const GJDownloadPanel = memo(GJDownloadPanelCore);
+export const DownloadShapePanel = memo(DownloadShapePanelCore);
