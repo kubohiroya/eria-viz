@@ -1,25 +1,25 @@
 import React from "react";
 import { memo } from "react";
-import { DownloadShapePanelProps } from "./DownloadShapePanelProps";
+import { DownloadShapesMatrixPanelProps } from "./DownloadShapesMatrixPanelProps";
 import { Table, TableBody, TableHead, TableRow } from "@mui/material";
-import { DownloadShapeHeaderPanel } from "./DownloadShapeHeaderPanel";
-import { DownloadShapeBodyPanel } from "./DownloadShapeBodyPanel";
+import { DownloadShapesMatrixHeaderPanel } from "./DownloadShapesMatrixHeaderPanel";
+import { DownloadShapesMatrixBodyPanel } from "./DownloadShapesMatrixBodyPanel";
 
 export const DownloadShapePanelCore = ({
   maxAdminLevel,
   downloadCountryMetadataArray,
   downloadStatusMatrix,
-}: DownloadShapePanelProps) => {
+}: DownloadShapesMatrixPanelProps) => {
   return (
     <>
       <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
-            <DownloadShapeHeaderPanel maxAdminLevel={maxAdminLevel} />
+            <DownloadShapesMatrixHeaderPanel maxAdminLevel={maxAdminLevel} />
           </TableRow>
         </TableHead>
         <TableBody>
-          <DownloadShapeBodyPanel
+          <DownloadShapesMatrixBodyPanel
             maxAdminLevel={maxAdminLevel}
             downloadCountryMetadataArray={downloadCountryMetadataArray}
             downloadStatusMatrix={downloadStatusMatrix}
@@ -29,4 +29,4 @@ export const DownloadShapePanelCore = ({
     </>
   );
 };
-export const DownloadShapePanel = memo(DownloadShapePanelCore);
+export const DownloadShapesMatrixPanel = memo(DownloadShapePanelCore);

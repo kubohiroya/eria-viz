@@ -1,3 +1,3 @@
 export type GJDialogProps = {
-    closeDialog: () => void;
+  closeDialog: () => void;
 };

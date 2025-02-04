@@ -1,42 +1,70 @@
-import React, {ReactNode, useContext, useEffect, useRef } from "react";
-import { useGeoJsonServiceContext } from "./useGeoJsonServiceContext";
+import React, {
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useGeoJsonCountryMetadataContext } from "./useGeoJsonCountryMetadata";
+import { CountryMetadata } from "../types/CountryMetadata";
 
 type CountryAdminContextValue = {
-    // TODO
-}
-
-const defaultCountryAdminContextValue: CountryAdminContextValue = {
-    // TODO
+  selectCheckboxMatrix: boolean[][];
+  setSelectCheckboxMatrix: (matrix: boolean[][]) => void;
+  selectedCount: number;
+  setSelectedCount: (count: number) => void;
 };
 
-export const CountryAdminContext = React.createContext<CountryAdminContextValue>(defaultCountryAdminContextValue);
+const defaultCountryAdminContextValue: CountryAdminContextValue = {
+  selectCheckboxMatrix: [],
+  setSelectCheckboxMatrix: () => {},
+  selectedCount: 0,
+  setSelectedCount: () => {},
+};
+
+export const CountryAdminContext =
+  React.createContext<CountryAdminContextValue>(
+    defaultCountryAdminContextValue,
+  );
 
 export const CountryAdminContextProvider = ({
-                                                children
-                                            }:{
-    children: ReactNode
-})=>{
+                                                children,
+                                            }: {
+    children: ReactNode;
+}) => {
+    const [selectCheckboxMatrix, setSelectCheckboxMatrix] = useState<boolean[][]>(
+      defaultCountryAdminContextValue.selectCheckboxMatrix,
+    );
+  const [selectedCount, setSelectedCount] = useState<number>(
+    defaultCountryAdminContextValue.selectedCount,
+  );
 
-    // TODO
-
-    const geoJsonService = useGeoJsonServiceContext();
+  const countryMetadataContext = useGeoJsonCountryMetadataContext();
 
     useEffect(() => {
-        (async()=>{
-        })()
-    }, []);
+      if(countryMetadataContext.countryMetadataArray.length === 0){
+          return;
+      }
+        const checkboxMatrix = countryMetadataContext.countryMetadataArray.map(
+          (countryMetadata: CountryMetadata) =>
+            new Array<boolean>(countryMetadata.numAdminLevels),
+        );
+        setSelectCheckboxMatrix(checkboxMatrix);
+  }, [countryMetadataContext.countryMetadataArray]);
 
-    useEffect(()=>{
-        (async()=>{
-            if (!geoJsonService) {
-                throw new Error("geoJsonService is not initialized");
-            }
-        })();
-    }, []);
+  return (
+    <CountryAdminContext.Provider
+      value={{
+        selectCheckboxMatrix,
+        setSelectCheckboxMatrix,
+        selectedCount,
+        setSelectedCount,
+      }}
+    >
+      {children}
+    </CountryAdminContext.Provider>
+  );
+};
 
-    return <CountryAdminContext.Provider value={{}}>{children}</CountryAdminContext.Provider>
-}
-
-export const useCountryAdminContext = (): CountryAdminContextValue =>{
-    return useContext(CountryAdminContext);
-}
+export const useCountryAdminContext = (): CountryAdminContextValue => {
+  return useContext(CountryAdminContext);
+};

@@ -1,16 +1,19 @@
 import {
-  Box,
   Checkbox,
-  CircularProgress,
+  Link,
   TableCell,
-  TableRow,
+  Typography,
 } from "@mui/material";
 import React from "react";
-import { CountryMetadata } from "../types/CountryMetadata";
-import { createNumberArray } from "../utils/arrayUtils";
-import {CheckboxState, GeoJsonService, HeaderCheckboxState } from "../services/GeoJsonService";
+import { CountryMetadata } from "../../types/CountryMetadata";
+import { createNumberArray } from "../../utils/arrayUtils";
+import {
+  CheckboxState,
+  GeoJsonService,
+  HeaderCheckboxState,
+} from "../../services/GeoJsonService";
 import { FileDownload, FileDownloadDone } from "@mui/icons-material";
-import { InlineIcon } from "./InlineIcon/InlineIcon";
+import { InlineIcon } from "../InlineIcon/InlineIcon";
 
 const FileDownloadReservedIcon = () => {
   return (
@@ -56,10 +59,10 @@ const FileAlreadyDownloadedIcon = () => {
   );
 };
 
-export const SelectCountryAdminBodyRow = ({
-                                            item,
-                                            dataIndex,
-  maxAdminLevel,
+export const CountryAdminsMatrixBodyRow = ({
+  item,
+  dataIndex,
+  numAdminLevels,
   headerCheckboxState,
   downloadedMatrix,
   checkboxMatrix,
@@ -68,7 +71,7 @@ export const SelectCountryAdminBodyRow = ({
 }: {
   item: CountryMetadata;
   dataIndex: number;
-  maxAdminLevel: number;
+  numAdminLevels: number;
   headerCheckboxState: HeaderCheckboxState;
   downloadedMatrix: boolean[][];
   checkboxMatrix: boolean[][];
@@ -78,30 +81,44 @@ export const SelectCountryAdminBodyRow = ({
     columnIndex: number,
   ) => () => void;
 }) => {
-
-  const rowHeaderChecked = headerCheckboxState.rowHeader[dataIndex] === CheckboxState.Checked
-  const rowHeaderIndetermined = headerCheckboxState.rowHeader[dataIndex] === CheckboxState.Indeterminate
+  const rowHeaderChecked =
+    headerCheckboxState.rowHeader[dataIndex] === CheckboxState.Checked;
+  const rowHeaderIndetermined =
+    headerCheckboxState.rowHeader[dataIndex] === CheckboxState.Indeterminate;
 
   return (
     <>
-      <TableCell component="th" scope="row" sx={{ width: 1 / 4 }}>
+      <TableCell
+        component="th"
+        scope="row"
+        sx={{
+          width: 250,
+          height: 50,
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+        }}
+      >
         <Checkbox
+          sx={{ alignItems: "start" }}
           checked={rowHeaderChecked ?? false}
           indeterminate={rowHeaderIndetermined ?? false}
           onChange={handleRowHeaderCheckboxChangeFactory(dataIndex)}
           name={dataIndex.toString()}
         />
-        <a
-          href={GeoJsonService.createCountryUrl(item.countryCode)}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {item.countryName}({item.countryCode})
-        </a>
+        <Typography sx={{ fontStyle: "bold" }}>
+          <Link
+            href={GeoJsonService.createCountryUrl(item.countryCode)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {item.countryName}({item.countryCode})
+          </Link>
+        </Typography>
       </TableCell>
-      {createNumberArray(maxAdminLevel).map((level: number) => (
-        <TableCell key={level} sx={{ width: 3 / 20 }}>
-          {level <= item.maxAdminLevel && (
+      {createNumberArray(numAdminLevels).map((level: number) => (
+        <TableCell key={level}>
+          {level < item.numAdminLevels ? (
             <>
               <Checkbox
                 icon={<FileDownloadNotReservedIcon />}
@@ -138,10 +155,13 @@ export const SelectCountryAdminBodyRow = ({
                 )}
               </InlineIcon>
             </>
+          ) : (
+            <>
+              <p>-</p>
+            </>
           )}
         </TableCell>
       ))}
     </>
   );
 };
-

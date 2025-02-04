@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { ReactNode, useContext, useEffect, useState } from "react";
 import React from "react";
 import { CountryMetadata } from "../types/CountryMetadata";
 import { GeoJSONMetadata, getGeoJSONDB } from "@eria-viz/indexeddb-geojson";
@@ -12,14 +12,14 @@ import { useParams } from "react-router";
 type GeoJsonCountryMetadataContextValue = {
   countryMetadataArray: CountryMetadata[];
   metadataArrayByCountryName: Map<string, GeoJSONMetadata[]>;
-  maxAdminLevel: number;
+  numAdminLevels: number;
 };
 
 const defaultGeoJsonCountryMetadataContext: GeoJsonCountryMetadataContextValue =
   {
     countryMetadataArray: [],
     metadataArrayByCountryName: new Map<string, GeoJSONMetadata[]>(),
-    maxAdminLevel: 0,
+    numAdminLevels: 0,
   };
 
 export const GeoJsonCountryMetadataContext =
@@ -32,8 +32,7 @@ export const GeoJsonCountryMetadataContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-
-  const {storageBundleName, sourceHostName} = useParams();
+  const { storageBundleName, sourceHostName } = useParams();
 
   const geoJsonService = useGeoJsonServiceContext();
   const [countryMetadataArray, setCountryMetadataArray] = useState<
@@ -42,8 +41,8 @@ export const GeoJsonCountryMetadataContextProvider = ({
   const [metadataArrayByCountryName, setMetadataArrayByCountryName] = useState<
     Map<string, GeoJSONMetadata[]>
   >(defaultGeoJsonCountryMetadataContext.metadataArrayByCountryName);
-  const [maxAdminLevel, setMaxAdminLevel] = useState<number>(
-    defaultGeoJsonCountryMetadataContext.maxAdminLevel,
+  const [numAdminLevels, setNumAdminLevels] = useState<number>(
+    defaultGeoJsonCountryMetadataContext.numAdminLevels,
   );
 
   useEffect(() => {
@@ -56,12 +55,9 @@ export const GeoJsonCountryMetadataContextProvider = ({
     if (!indexedDBName) {
       return;
     }
-    if(!sourceHostName) {
+    if (!sourceHostName) {
       return;
     }
-
-    console.log("indexedDBName", indexedDBName);
-    console.log("sourceHostName", sourceHostName);
 
     const geojsonDB = getGeoJSONDB(indexedDBName);
     geojsonDB.geojsonMetadata
@@ -73,35 +69,38 @@ export const GeoJsonCountryMetadataContextProvider = ({
         setMetadataArrayByCountryName(
           groupBy({ source: geoJsonMetadataArray, key: "countryName" }),
         );
-        setMaxAdminLevel(
-          geoJsonService.geoJsonService?.catalog.properties.maxAdminLevel,
+        setNumAdminLevels(
+          geoJsonService.geoJsonService?.catalog.properties.numAdminLevels,
         );
         setCountryMetadataArray(
           geoJsonMetadataArray.map((geoJsonMetadata: GeoJSONMetadata) => {
             return {
               countryName: geoJsonMetadata.countryName,
               countryCode: geoJsonMetadata.countryCode,
-              maxAdminLevel,
+              numAdminLevels,
             };
           }),
         );
       });
 
-    download(SourceHosts[sourceHostName].countryIndexPageUrl,
-      {
-        onFailed: (e) => {
-          console.error(e);
-        },
-        onParseError: (e) => {
-          console.error(e);
-        },
-        text: (content) => {
-          createCountryMetadataArrayByContent(content).then((countryMetadataArray) => {
+    download(SourceHosts[sourceHostName].countryIndexPageUrl, {
+      onFailed: (e) => {
+        console.error(e);
+      },
+      onParseError: (e) => {
+        console.error(e);
+      },
+      text: (content) => {
+        createCountryMetadataArrayByContent(content).then(
+          (countryMetadataArray) => {
             setCountryMetadataArray(countryMetadataArray);
-            setMaxAdminLevel(GeoJsonService.countMaxAdminLevel(countryMetadataArray));
-          });
-        }
-      });
+            setNumAdminLevels(
+              GeoJsonService.countMaxAdminLevel(countryMetadataArray),
+            );
+          },
+        );
+      },
+    });
   }, [geoJsonService]);
 
   return (
@@ -109,7 +108,7 @@ export const GeoJsonCountryMetadataContextProvider = ({
       value={{
         countryMetadataArray,
         metadataArrayByCountryName,
-        maxAdminLevel,
+        numAdminLevels,
       }}
     >
       {children}
@@ -135,19 +134,20 @@ const createCountryMetadataArrayByContent = async (
     if (value === null || !value.includes("_")) {
       continue;
     }
-    const [countryCode, countryName, maxAdminLevel] = option
+    const [countryCode, countryName, numAdminLevels] = option
       .getAttribute("value")!
       .split("_");
     countryMetadataArray.push({
       countryName,
       countryCode,
-      maxAdminLevel: parseInt(maxAdminLevel),
+      numAdminLevels: parseInt(numAdminLevels),
     });
   }
 
   return countryMetadataArray;
 };
 
-export const useGeoJsonCountryMetadataContext = (): GeoJsonCountryMetadataContextValue => {
-  return useContext(GeoJsonCountryMetadataContext);
-};
+export const useGeoJsonCountryMetadataContext =
+  (): GeoJsonCountryMetadataContextValue => {
+    return useContext(GeoJsonCountryMetadataContext);
+  };

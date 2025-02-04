@@ -12,7 +12,7 @@ export type GJIconProps = {
   level: number;
 };
 
-const ShapeIconCore = ({ level }: GJIconProps) => {
+const ShapeLevelIconCore = ({ level }: GJIconProps) => {
   return (
     <Tooltip
       title={`Level ${level}: ${level === 0 ? "Country" : level === 1 ? "Division" : level === 2 ? "Subdivision" : level === 3 ? "Subsubdivision" : ""}`}
@@ -36,4 +36,4 @@ const ShapeIconCore = ({ level }: GJIconProps) => {
     </Tooltip>
   );
 };
-export const ShapeIcon = memo(ShapeIconCore);
+export const ShapeLevelIcon = memo(ShapeLevelIconCore);

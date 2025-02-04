@@ -10,31 +10,39 @@ import {
   Select,
   Typography,
 } from "@mui/material";
-import { InlineIcon } from "./InlineIcon/InlineIcon";
+import { InlineIcon } from "../InlineIcon/InlineIcon";
 import { Launch } from "@mui/icons-material";
-import { SelectSourceHostPanelProps } from "./SelectSourceHostPanelProps";
+import { SourceHostsPanelProps } from "./SourceHostsPanelProps";
 import { Link } from "react-router";
-import {SourceHostMetadata, SourceHostNameArray, SourceHostNames, SourceHosts } from "../types/SourceHosts";
-import { useSourceHostContext } from "../hooks/useSourceHostContext";
+import {
+  SourceHostMetadata,
+  SourceHostNameArray,
+  SourceHostNames,
+  SourceHosts,
+} from "../../types/SourceHosts";
+import { useSourceHostContext } from "../../hooks/useSourceHostContext";
 
-export const SelectSourceHostPanelCore = ({
+export const SourceHostsPanelCore = ({
   agreeLicense,
-}: SelectSourceHostPanelProps) => {
-
+}: SourceHostsPanelProps) => {
   const sourceHostContext = useSourceHostContext();
-  const [sourceHostName, setSourceHostName] = useState<string>(sourceHostContext.sourceHostName);
+  const [sourceHostName, setSourceHostName] = useState<string>(
+    sourceHostContext.sourceHostName,
+  );
 
   const getEntry = useCallback((): SourceHostMetadata => {
     return (
-      (sourceHostContext.sourceHostName && SourceHosts[sourceHostContext.sourceHostName]) || SourceHosts[SourceHostNames.GADM]
+      (sourceHostContext.sourceHostName &&
+        SourceHosts[sourceHostContext.sourceHostName]) ||
+      SourceHosts[SourceHostNames.GADM]
     );
   }, [sourceHostContext.sourceHostName]);
 
-  const handleSelectSourceHost = useCallback((event: any)=>{
-    const newSourceHostName = event.target.value as string
+  const handleSelectSourceHost = useCallback((event: any) => {
+    const newSourceHostName = event.target.value as string;
     setSourceHostName(newSourceHostName);
     sourceHostContext.setSourceHostName(newSourceHostName);
-  },[]);
+  }, []);
 
   const handleOpenLicensePage = useCallback(() => {
     sourceHostName && agreeLicense(sourceHostName);
@@ -69,7 +77,11 @@ export const SelectSourceHostPanelCore = ({
 
       <Alert severity="info">
         <Typography variant="h5" gutterBottom>
-          <Link to={getEntry().sourceHostPageUrl} target="_blank" rel="noreferrer">
+          <Link
+            to={getEntry().sourceHostPageUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
             {getEntry().sourceHostName}
           </Link>
         </Typography>
@@ -81,7 +93,11 @@ export const SelectSourceHostPanelCore = ({
             margin: "20px",
           }}
         >
-          <Button size={"large"} variant={"contained"} onClick={handleOpenLicensePage}>
+          <Button
+            size={"large"}
+            variant={"contained"}
+            onClick={handleOpenLicensePage}
+          >
             <a
               style={{ textDecoration: "none", color: "white" }}
               href={getEntry().licensePageUrl}
@@ -99,4 +115,4 @@ export const SelectSourceHostPanelCore = ({
     </>
   );
 };
-export const SelectSourceHostPanel = memo(SelectSourceHostPanelCore);
+export const SourceHostsPanel = memo(SourceHostsPanelCore);

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-export type SelectStorageBundlePanelProps = {
+export type StorageBundlesPanelProps = {
   children: ReactNode;
   label: string;
   onStorageBundleSelected: (storageBundleName: string) => void;

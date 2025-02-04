@@ -8,17 +8,17 @@ import {
   TextField,
 } from "@mui/material";
 import { FiberNew } from "@mui/icons-material";
-import { SelectStorageBundlePanelProps } from "./SelectStorageBundlePanelProps";
-import { useStorageBundleContext } from "../hooks/useStorageBundleContext";
+import { StorageBundlesPanelProps } from "./StorageBundlesPanelProps";
+import { useStorageBundleContext } from "../../hooks/useStorageBundleContext";
 
-const SelectStorageBundlePanelCore = ({
+const StorageBundlesPanelCore = ({
   children,
   label,
   onStorageBundleSelected,
-}: SelectStorageBundlePanelProps) => {
+}: StorageBundlesPanelProps) => {
   const storageContext = useStorageBundleContext();
 
-  const [value, setValue] = useState<string>('');
+  const [value, setValue] = useState<string>("");
   const [options, setOptions] = useState<string[]>([]);
 
   const handleChange = useCallback(
@@ -43,13 +43,17 @@ const SelectStorageBundlePanelCore = ({
   }, [value]);
 
   useEffect(() => {
-    if(storageContext.storageBundleName) {
+    if (storageContext.storageBundleName) {
       setValue(storageContext.storageBundleName);
     }
-    if(storageContext.storageBundleNames){
+    if (storageContext.storageBundleNames) {
       setOptions(storageContext.storageBundleNames);
     }
-  }, [storageContext, storageContext.storageBundleNames, storageContext.storageBundleName]);
+  }, [
+    storageContext,
+    storageContext.storageBundleNames,
+    storageContext.storageBundleName,
+  ]);
 
   return (
     <>
@@ -75,10 +79,11 @@ const SelectStorageBundlePanelCore = ({
           renderInput={(params) => <TextField {...params} label={label} />}
         />
         <Box style={{ alignContent: "center" }}>
-          {value !== "" && !storageContext.storageBundleNames.includes(value) && <FiberNew />}
+          {value !== "" &&
+            !storageContext.storageBundleNames.includes(value) && <FiberNew />}
         </Box>
       </Box>
     </>
   );
 };
-export const SelectStorageBundlePanel = memo(SelectStorageBundlePanelCore);
+export const StorageBundlesPanel = memo(StorageBundlesPanelCore);

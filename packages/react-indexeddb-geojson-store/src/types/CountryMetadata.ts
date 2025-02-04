@@ -1,5 +1,5 @@
 export type CountryMetadata = {
-    countryName: string;
-    countryCode: string;
-    maxAdminLevel: number;
+  countryName: string;
+  countryCode: string;
+  numAdminLevels: number;
 };

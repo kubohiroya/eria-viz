@@ -1,12 +1,12 @@
-import {CircularProgress, TableCell, TableRow,} from "@mui/material";
-import React, {memo} from "react";
-import {CountryMetadata} from "../types/CountryMetadata";
-import {createNumberArray} from "../utils/arrayUtils";
-import {DownloadStatus} from "../types/DownloadStatus";
-import {GeoJsonService} from "../services/GeoJsonService";
+import { CircularProgress, TableCell, TableRow } from "@mui/material";
+import React, { memo } from "react";
+import { CountryMetadata } from "../../types/CountryMetadata";
+import { createNumberArray } from "../../utils/arrayUtils";
+import { DownloadStatus } from "../../types/DownloadStatus";
+import { GeoJsonService } from "../../services/GeoJsonService";
 import { DownloadingIcon } from "./DownloadingIcon";
 
-const DownloadShapeBodyPanelCore = ({
+const DownloadShapesMatrixBodyPanelCore = ({
   maxAdminLevel,
   downloadCountryMetadataArray,
   downloadStatusMatrix,
@@ -15,17 +15,17 @@ const DownloadShapeBodyPanelCore = ({
   downloadCountryMetadataArray: CountryMetadata[];
   downloadStatusMatrix: DownloadStatus[][];
 }) => {
-  if(downloadCountryMetadataArray.length === 0) {
+  if (downloadCountryMetadataArray.length === 0) {
     <TableRow>
-        <TableCell colSpan={maxAdminLevel + 1} align="center">
-            <CircularProgress />
-        </TableCell>
-    </TableRow>
+      <TableCell colSpan={maxAdminLevel + 1} align="center">
+        <CircularProgress />
+      </TableCell>
+    </TableRow>;
   }
   return downloadCountryMetadataArray.map(
     (item: CountryMetadata, dataIndex: number) => (
-        <TableRow key={dataIndex}>
-        <TableCell component="th" scope="row" >
+      <TableRow key={dataIndex}>
+        <TableCell component="th" scope="row">
           <a
             href={GeoJsonService.createCountryUrl(item.countryCode)}
             target="_blank"
@@ -36,7 +36,7 @@ const DownloadShapeBodyPanelCore = ({
         </TableCell>
         {createNumberArray(maxAdminLevel).map((level: number) => (
           <TableCell key={level} align="center">
-            {level <= item.maxAdminLevel && (
+            {level <= item.numAdminLevels && (
               <DownloadingIcon
                 state={downloadStatusMatrix[dataIndex]?.[level]}
               />
@@ -47,4 +47,4 @@ const DownloadShapeBodyPanelCore = ({
     ),
   );
 };
-export const DownloadShapeBodyPanel = memo(DownloadShapeBodyPanelCore);
+export const DownloadShapesMatrixBodyPanel = memo(DownloadShapesMatrixBodyPanelCore);
