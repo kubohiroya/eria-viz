@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "app",
     "strict": true,
     "jsx": "react",
     "target": "esnext",
@@ -7,12 +8,18 @@
     "lib": ["dom", "esnext"],
     "types": ["node", "vite/client", "vite-plugin-comlink/client"],
     "outDir": "dist",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "emitDeclarationOnly": true,
     "allowImportingTsExtensions": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": true,
+    "plugins": [{ "name": "@react-router/dev" }],
+    "rootDirs": [".", "./.react-router/types/"],
+    "paths": {
+      "@/*": ["app/*"],
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules"],
+  "include": ["**/*.ts", "**/*.tsx", ".react-router/types/**/*", "*.ts"],
+  "exclude": ["node_modules"]
 }
